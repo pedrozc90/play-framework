@@ -1,0 +1,4 @@
+# Routes
+GET     /                           controllers.Application.index()
+GET     /health                     controllers.Application.health()
+POST    /orders                     controllers.Application.order()

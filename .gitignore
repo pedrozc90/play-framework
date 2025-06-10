@@ -1,0 +1,9 @@
+.idea/*
+.settings/*
+*.iml
+
+# play files
+logs
+project/project/*
+project/target/*
+target/*
