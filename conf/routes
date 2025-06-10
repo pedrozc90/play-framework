@@ -1,0 +1,8 @@
+# Routes
+GET         /                    controllers.Application.index()
+
+GET         /health              controllers.health.HealthController.health()
+
+POST        /api/files           controllers.files.FileController.upload()
+
+GET         /assets/*file        controllers.Assets.at(path = "/public", file)

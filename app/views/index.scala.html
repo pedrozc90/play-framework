@@ -1,0 +1,24 @@
+@(title: String, message: String)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@title</title>
+        <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/styles.css")">
+    </head>
+    <body>
+        <main class="container">
+            <h1>@message</h1>
+            <p>Welcome to the REST API index page.</p>
+            <p>Use the following endpoints to interact with the API:</p>
+            <ul>
+                <li><code>GET /api/items</code> — List all items</li>
+                <li><code>GET /api/items/:id</code> — Get item by ID</li>
+                <li><code>POST /api/items</code> — Create a new item</li>
+            </ul>
+            <p>For full documentation, contact the development team or check the README.</p>
+        </main>
+    </body>
+</html>
