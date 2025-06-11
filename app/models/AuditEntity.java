@@ -12,6 +12,9 @@ import java.util.UUID;
 @EntityListeners(value = { AutitListener.class })
 public abstract class AuditEntity implements Serializable {
 
+    @Column(name = "uuid", length = 36, nullable = false, updatable = false)
+    private String uuid = UUID.randomUUID().toString();
+
     @Column(name = "inserted_at", nullable = false)
     private Timestamp insertedAt;
 
@@ -22,8 +25,13 @@ public abstract class AuditEntity implements Serializable {
     @Column(name = "version", nullable = false)
     private Integer version = 0;
 
-    @Column(name = "uuid", length = 36, nullable = false, updatable = false)
-    private String uuid = UUID.randomUUID().toString();
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public Timestamp getInsertedAt() {
         return insertedAt;
@@ -47,14 +55,6 @@ public abstract class AuditEntity implements Serializable {
 
     public void setVersion(Integer version) {
         this.version = version;
-    }
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
     }
 
 }

@@ -1,4 +1,4 @@
-package utils.mappers;
+package mappers;
 
 import controllers.objects.PurchaseOrderDto;
 import models.PurchaseOrder;
@@ -21,6 +21,7 @@ public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, Purchase
         if (entity == null) return null;
 
         final PurchaseOrderDto dto = new PurchaseOrderDto();
+        dto.setId(entity.getId());
         dto.setHash(entity.getHash());
         dto.setNumber(entity.getNumber());
         dto.setStatus(entity.getStatus());
@@ -29,8 +30,9 @@ public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, Purchase
     }
 
     @Override
-    public PurchaseOrder toModel(final PurchaseOrder entity, final PurchaseOrderDto dto) {
+    public PurchaseOrder toEntity(final PurchaseOrder entity, final PurchaseOrderDto dto) {
         if (dto == null) return null;
+        entity.setId(dto.getId());
         entity.setHash(dto.getHash());
         entity.setNumber(dto.getNumber());
         entity.setStatus(dto.getStatus());
@@ -38,8 +40,8 @@ public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, Purchase
     }
 
     @Override
-    public PurchaseOrder toModel(final PurchaseOrderDto dto) {
-        return toModel(new PurchaseOrder(), dto);
+    public PurchaseOrder toEntity(final PurchaseOrderDto dto) {
+        return toEntity(new PurchaseOrder(), dto);
     }
 
 }

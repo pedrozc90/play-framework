@@ -1,20 +1,18 @@
 package services;
 
-import controllers.objects.OrderDto;
-import controllers.objects.OrderItemDto;
+import mappers.OrderMapper;
 import models.Order;
-import models.OrderItem;
+import models.Supplier;
 import repositories.OrderRepository;
 
-import java.util.Set;
-import java.util.stream.Collectors;
-
-public class OrderService {
+public class OrderService implements EntityService<Order> {
 
     private static OrderService instance;
 
     private static final OrderRepository repository = OrderRepository.getInstance();
+    private static final OrderMapper orderMapper = OrderMapper.getInstance();
     private static final OrderItemService orderItemService = OrderItemService.getInstance();
+    private static final SupplierService supplierService = SupplierService.getInstance();
 
     public static OrderService getInstance() {
         if (instance == null) {
@@ -23,25 +21,37 @@ public class OrderService {
         return instance;
     }
 
-    public Order create(final String poClientNumber, final String supplierId, final String status) {
+    // QUERIES
+    public Order get(final Long id) {
+        return repository.findById(id);
+    }
+
+    public Order get(final String number) {
+        return repository.getByNumber(number);
+    }
+
+    // METHODS
+    public Order create(final String number, final String status, final Supplier supplier) {
         final Order obj = new Order();
         obj.setStatus(status);
-        obj.setNumber(poClientNumber);
-        obj.setSupplier(supplierId);
+        obj.setNumber(number);
+        obj.setSupplier(supplier);
         return repository.persist(obj);
     }
 
-    public Order create(final OrderDto dto) {
-        final String labelType = dto.getItems().stream()
-            .map(OrderItemDto::getLabelType)
-            .collect(Collectors.joining(", "));
+    @Override
+    public void persist(final Order entity) {
+        repository.persist(entity);
+    }
 
-        final Order order = create(dto.getNumber(), dto.getSupplier(), labelType);
+    @Override
+    public Order save(final Order entity) {
+        return repository.merge(entity);
+    }
 
-        final Set<OrderItem> items = orderItemService.create(dto.getItems(), order);
-
-        order.setItems(items);
-        return order;
+    @Override
+    public void remove(final Order entity) {
+        repository.remove(entity);
     }
 
 }

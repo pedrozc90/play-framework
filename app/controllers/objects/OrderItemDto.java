@@ -1,81 +1,51 @@
 package controllers.objects;
 
-import com.fasterxml.jackson.annotation.JsonAnyGetter;
-import com.fasterxml.jackson.annotation.JsonAnySetter;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class OrderItemDto {
 
-    @JsonProperty(value = "ean", required = true)
-    private String ean;
+    @JsonProperty(value = "id")
+    private Long id;
 
     @JsonProperty(value = "quantity", required = true)
     private Integer quantity = 0;
 
-    @JsonProperty(value = "description", required = true)
-    private String description;
-
     @JsonProperty(value = "label_type", required = true)
     private String labelType;
 
-    @JsonIgnore
-    private Map<String, Object> metadata = new HashMap<>();
+    @JsonProperty(value = "product", required = true)
+    private ProductDto product;
 
-    public String getEan() {
-        return ean;
+    public Long getId() {
+        return id;
     }
 
-    public void setEan(String ean) {
-        this.ean = ean;
+    public void setId(final Long id) {
+        this.id = id;
     }
 
     public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(final Integer quantity) {
         this.quantity = quantity;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
     }
 
     public String getLabelType() {
         return labelType;
     }
 
-    public void setLabelType(String labelType) {
+    public void setLabelType(final String labelType) {
         this.labelType = labelType;
     }
 
-    public Map<String, Object> getMetadata() {
-        return metadata;
+    public ProductDto getProduct() {
+        return product;
     }
 
-    public void setMetadata(Map<String, Object> metadata) {
-        this.metadata = metadata;
-    }
-
-    @JsonAnyGetter
-    public Map<String, Object> any() {
-        return metadata;
-    }
-
-    @JsonAnySetter
-    public void set(final String key, final Object value) {
-        if (metadata == null) {
-            metadata = new HashMap<>();
-        }
-        metadata.put(key, value);
+    public void setProduct(final ProductDto product) {
+        this.product = product;
     }
 
 }

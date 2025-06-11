@@ -1,91 +1,132 @@
 package actors;
 
 import akka.actor.AbstractLoggingActor;
+import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import models.PurchaseOrder;
 import play.db.jpa.JPA;
-import repositories.PurchaseOrderRepository;
+import repositories.tuples.PurchaseOrderTuple;
 import scala.PartialFunction;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
+import services.PurchaseOrderService;
 
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+// Core idea:
+// - Scheduler fetches WAITING records, marks as ONGOING
+// - Dispatcher maintains a global queue and launches limited workers
+// - Each worker handles one order at a time, per number ordering is handled centrally
 public class SchedulerActor extends AbstractLoggingActor {
 
-    private final PurchaseOrderRepository repository;
+    private final ActorRef dispatcher;
+    private final PurchaseOrderService purchaseOrderService;
 
-    public static Props props(final PurchaseOrderRepository repository) {
-        return Props.create(SchedulerActor.class, () -> new SchedulerActor(repository));
+    public static Props props() {
+        return Props.create(SchedulerActor.class, () -> new SchedulerActor());
     }
 
     /**
      * Message definitions to avoid magic strings
      **/
     public static final class CheckOrders {
-        public static final CheckOrders INSTANCE = new CheckOrders();
-
-        private CheckOrders() {
-        }
     }
 
-    public SchedulerActor(final PurchaseOrderRepository repository) {
-        this.repository = repository;
+    public static final class ResumeOngoingOrders {
+    }
+
+    public SchedulerActor() {
+        this.dispatcher = getContext().actorOf(DispatcherActor.props(5), "dispatcher");
+        this.purchaseOrderService = PurchaseOrderService.getInstance();
         receive(createReceive());
+    }
+
+    public PartialFunction<Object, BoxedUnit> createReceive() {
+        return ReceiveBuilder
+            .match(CheckOrders.class, this::onCheckOrders)
+            .match(ResumeOngoingOrders.class, this::onResumeOngoingOrders)
+            .matchAny(this::unhandled)
+            .build();
     }
 
     @Override
     public void preStart() throws Exception {
-        log().info("SchedulerActor started");
+        log().info("{} started", self().path());
         scheduleNextRun();
     }
 
     @Override
     public void postStop() throws Exception {
-        log().info("SchedulerActor stopped");
+        log().info("{} stopped", self().path());
     }
 
-    public PartialFunction<Object, BoxedUnit> createReceive() {
-        return ReceiveBuilder
-            .match(CheckOrders.class, this::handledMessage)
-            .matchAny(this::unhandled)
-            .build();
-    }
-
-    private void handledMessage(final Object obj) {
-        if (obj == CheckOrders.INSTANCE) {
-            processWaitingOrders();
-            scheduleNextRun();
-        }
+    private void onCheckOrders(final CheckOrders obj) {
+        processWaitingOrders();
+        scheduleNextRun();
     }
 
     private void processWaitingOrders() {
         try {
-            JPA.withTransaction(() -> {
-                List<PurchaseOrder> waitingOrders = repository.findWaitingOrders();
-                log().info("Found {} orders in WAITING status", waitingOrders.size());
+            final Set<PurchaseOrderTuple> toDispatch = new LinkedHashSet<>();
 
-                for (PurchaseOrder order : waitingOrders) {
-                    handleOrder(order);
+            JPA.withTransaction(() -> {
+                // filter only purchase orders where status = WAITING and order by id ASC
+                // set lock mode to PESSIMISTIC_WRITE
+                final List<PurchaseOrder> list = purchaseOrderService.findWaitingOrders();
+                for (PurchaseOrder row : list) {
+                    // updates entity status to ONGOING
+                    final PurchaseOrderTuple tuple = handlePurchaseOrder(row);
+                    if (tuple != null) {
+                        // only store IDs/references, not full entity
+                        toDispatch.add(tuple);
+                    }
                 }
             });
+
+            // now that the ONGOING updates are committed, safely dispatch
+            for (PurchaseOrderTuple tuple : toDispatch) {
+                dispatchToWorker(tuple);
+            }
         } catch (Exception e) {
             log().error(e, "Error in scheduler execution");
         }
     }
 
-    private void handleOrder(PurchaseOrder order) {
+    private void onResumeOngoingOrders(final ResumeOngoingOrders obj) {
+        // Optional: revert ONGOING back to WAITING for all orders that got stuck
         try {
-            // Process each order
-            // You can send each order to another actor for processing
-            log().info("Processing order: {}", order.getNumber());
-            // Example: getContext().actorSelection("/user/orderProcessor").tell(order, getSelf());
+            JPA.withTransaction(() -> {
+                final List<PurchaseOrder> list = purchaseOrderService.findOngoing();
+                for (PurchaseOrder row : list) {
+                    row.setStatus(PurchaseOrder.Status.WAITING);
+                }
+                log().info("Reverted {} ONGOING orders back to WAITING", list.size());
+            });
         } catch (Exception e) {
-            log().error("Error processing order " + order.getNumber(), e);
+            log().error(e, "Failed to revert ONGOING orders to WAITING");
         }
+
+        // After reverting, immediately kick off a normal check to pick up those WAITING orders
+        self().tell(new CheckOrders(), self());
+    }
+
+    private PurchaseOrderTuple handlePurchaseOrder(final PurchaseOrder purchaseOrder) {
+        if (purchaseOrder != null && purchaseOrder.getStatus() == PurchaseOrder.Status.WAITING) {
+            purchaseOrder.setStatus(PurchaseOrder.Status.ONGOING);
+            log().info("PurchaseOrder {} updated to ONGOING", purchaseOrder.getId());
+            return new PurchaseOrderTuple(purchaseOrder);
+        }
+        return null;
+    }
+
+    private void dispatchToWorker(final PurchaseOrderTuple tuple) {
+        dispatcher.tell(new DispatcherActor.Enqueue(tuple), self());
+        log().info("PurchaseOrder {} dispatched", tuple.getId());
     }
 
     private void scheduleNextRun() {
@@ -94,7 +135,7 @@ public class SchedulerActor extends AbstractLoggingActor {
         getContext().system().scheduler().scheduleOnce(
             duration,
             self(),
-            CheckOrders.INSTANCE,
+            new CheckOrders(),
             getContext().dispatcher(),
             self()
         );

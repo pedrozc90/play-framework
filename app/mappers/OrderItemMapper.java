@@ -1,12 +1,13 @@
-package utils.mappers;
+package mappers;
 
 import controllers.objects.OrderItemDto;
+import controllers.objects.ProductDto;
 import models.OrderItem;
-
-import java.util.HashMap;
-import java.util.Optional;
+import models.Product;
 
 public class OrderItemMapper implements EntityMapper<OrderItem, OrderItemDto> {
+
+    private static final ProductMapper productMapper = ProductMapper.getInstance();
 
     private static OrderItemMapper instance;
 
@@ -20,32 +21,33 @@ public class OrderItemMapper implements EntityMapper<OrderItem, OrderItemDto> {
     @Override
     public OrderItemDto toDto(final OrderItem entity) {
         if (entity == null) return null;
+
+        final ProductDto product = productMapper.toDto(entity.getProduct());
+
         final OrderItemDto dto = new OrderItemDto();
-        dto.setEan(entity.getEan());
+        dto.setId(entity.getId());
         dto.setQuantity(entity.getQuantity());
-        dto.setDescription(entity.getDescription());
         dto.setLabelType(entity.getLabelType());
-        dto.setMetadata(new HashMap<>());
-        dto.getMetadata().put("size", entity.getSize());
+        dto.setProduct(product);
         return dto;
     }
 
     @Override
-    public OrderItem toModel(final OrderItem entity, final OrderItemDto dto) {
+    public OrderItem toEntity(final OrderItem entity, final OrderItemDto dto) {
         if (entity == null || dto == null) return null;
-        entity.setEan(dto.getEan());
+
+        final Product product = productMapper.toEntity(entity.getProduct(), dto.getProduct());
+
+        entity.setId(dto.getId());
         entity.setQuantity(dto.getQuantity());
-        entity.setDescription(dto.getDescription());
         entity.setLabelType(dto.getLabelType());
-        Optional.ofNullable(dto.getMetadata())
-            .map(v -> v.get("size"))
-            .ifPresent(v -> entity.setSize(v.toString()));
+        entity.setProduct(product);
         return entity;
     }
 
     @Override
-    public OrderItem toModel(final OrderItemDto dto) {
-        return toModel(new OrderItem(), dto);
+    public OrderItem toEntity(final OrderItemDto dto) {
+        return toEntity(new OrderItem(), dto);
     }
 
 }

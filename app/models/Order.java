@@ -17,11 +17,12 @@ public class Order extends AuditEntity implements Serializable {
     @Column(name = "number", length = 32, nullable = false)
     private String number;
 
-    @Column(name = "supplier", length = 32, nullable = false)
-    private String supplier;
-
     @Column(name = "status", length = 32, nullable = false)
     private String status;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "supplier_id", nullable = false)
+    private Supplier supplier;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> items = new HashSet<>();
@@ -30,7 +31,7 @@ public class Order extends AuditEntity implements Serializable {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -38,31 +39,31 @@ public class Order extends AuditEntity implements Serializable {
         return number;
     }
 
-    public void setNumber(String poClientNumber) {
+    public void setNumber(final String poClientNumber) {
         this.number = poClientNumber;
-    }
-
-    public String getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(String supplierId) {
-        this.supplier = supplierId;
     }
 
     public String getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(final String status) {
         this.status = status;
+    }
+
+    public Supplier getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(final Supplier supplier) {
+        this.supplier = supplier;
     }
 
     public Set<OrderItem> getItems() {
         return items;
     }
 
-    public void setItems(Set<OrderItem> items) {
+    public void setItems(final Set<OrderItem> items) {
         this.items = items;
     }
 

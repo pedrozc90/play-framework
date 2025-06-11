@@ -4,7 +4,7 @@ import play.db.jpa.JPA;
 
 public class JpaRepository<T, ID> {
 
-    private final Class<T> clazz;
+    protected final Class<T> clazz;
 
     public JpaRepository(final Class<T> clazz) {
         this.clazz = clazz;

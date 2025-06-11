@@ -1,5 +1,6 @@
 package models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
@@ -7,6 +8,14 @@ import javax.persistence.*;
 @Entity
 @Table(name = "purchase_orders")
 public class PurchaseOrder extends AuditEntity {
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING)
+    public enum Status {
+        WAITING,
+        ONGOING,
+        DONE,
+        ERROR;
+    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -24,8 +33,9 @@ public class PurchaseOrder extends AuditEntity {
     @Column(name = "content", columnDefinition = "TEXT", nullable = false)
     private String content;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", length = 32, nullable = false)
-    private String status = "WAITING";
+    private Status status = Status.WAITING;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
@@ -63,11 +73,11 @@ public class PurchaseOrder extends AuditEntity {
         this.content = content;
     }
 
-    public String getStatus() {
+    public Status getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(Status status) {
         this.status = status;
     }
 
