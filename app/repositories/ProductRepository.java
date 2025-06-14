@@ -20,7 +20,7 @@ public class ProductRepository extends JpaRepository<Product, Long> {
         super(Product.class);
     }
 
-    public Product getByCode(final String ean) {
+    public Product getByEan(final String ean) {
         try {
             return JPA.em()
                 .createQuery("SELECT p FROM Product p WHERE p.ean = :ean", clazz)

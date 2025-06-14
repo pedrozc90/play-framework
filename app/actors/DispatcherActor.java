@@ -12,7 +12,7 @@ import java.util.*;
 
 public class DispatcherActor extends AbstractLoggingActor {
 
-    private final int num;
+    private final int num; // maximum number of workers
     private final Queue<PurchaseOrderTuple> queue = new LinkedList<>();
     private final Map<String, ActorRef> workers = new HashMap<>();
 

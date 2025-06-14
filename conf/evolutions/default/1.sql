@@ -1,3 +1,5 @@
+# --- !Ups
+
 -- suppliers
 CREATE TABLE IF NOT EXISTS suppliers (
     id BIGSERIAL NOT NULL,
@@ -59,6 +61,8 @@ CREATE TABLE IF NOT EXISTS orders_items (
 
     quantity INTEGER NOT NULL DEFAULT 0,
     label_type VARCHAR(32) NOT NULL,
+    cancelled boolean NOT NULL DEFAULT false,
+
     order_id BIGINT NOT NULL,
     product_id BIGINT NOT NULL,
 
@@ -80,6 +84,7 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
     hash VARCHAR(32) NOT NULL,
     content TEXT NOT NULL,
     status VARCHAR(32) NOT NULL DEFAULT 'WAITING',
+    changelog TEXT,
 
     order_id BIGINT,
 

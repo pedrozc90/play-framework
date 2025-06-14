@@ -1,11 +1,16 @@
 package mappers;
 
+import actors.objects.ChangeLog;
+import actors.objects.ChangeLogDto;
+import com.fasterxml.jackson.databind.JsonNode;
 import controllers.objects.PurchaseOrderDto;
 import models.PurchaseOrder;
+import play.libs.Json;
 
 public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, PurchaseOrderDto> {
 
-    private static final OrderMapper mapper = OrderMapper.getInstance();
+    private static final OrderMapper orderMapper = OrderMapper.getInstance();
+    private static final ChangeLogMapper changeLogMapper = ChangeLogMapper.getInstance();
 
     private static PurchaseOrderMapper instance;
 
@@ -20,12 +25,15 @@ public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, Purchase
     public PurchaseOrderDto toDto(final PurchaseOrder entity) {
         if (entity == null) return null;
 
+        final ChangeLogDto changelog = changeLogMapper.toDto(entity.getChangelog());
+
         final PurchaseOrderDto dto = new PurchaseOrderDto();
         dto.setId(entity.getId());
         dto.setHash(entity.getHash());
         dto.setNumber(entity.getNumber());
         dto.setStatus(entity.getStatus());
-        dto.setOrder(mapper.toDto(entity.getOrder()));
+        dto.setChangelog(changelog);
+        dto.setOrder(orderMapper.toDto(entity.getOrder()));
         return dto;
     }
 

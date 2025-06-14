@@ -1,5 +1,7 @@
 package controllers.objects;
 
+import actors.objects.ChangeLog;
+import actors.objects.ChangeLogDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import models.PurchaseOrder;
@@ -19,6 +21,9 @@ public class PurchaseOrderDto implements Serializable {
 
     @JsonProperty(value = "status", required = true)
     private PurchaseOrder.Status status;
+
+    @JsonProperty(value = "changelog", required = true)
+    private ChangeLogDto changelog;
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "order", required = true)
@@ -54,6 +59,14 @@ public class PurchaseOrderDto implements Serializable {
 
     public void setStatus(final PurchaseOrder.Status status) {
         this.status = status;
+    }
+
+    public ChangeLogDto getChangelog() {
+        return changelog;
+    }
+
+    public void setChangelog(final ChangeLogDto changelog) {
+        this.changelog = changelog;
     }
 
     public OrderDto getOrder() {

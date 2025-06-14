@@ -1,7 +1,12 @@
 package services;
 
+import actors.objects.ChangeLogEntry;
+import actors.objects.Resolved;
 import models.Supplier;
 import repositories.SupplierRepository;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SupplierService implements EntityService<Supplier> {
 
@@ -21,13 +26,6 @@ public class SupplierService implements EntityService<Supplier> {
         return repository.getByCode(code);
     }
 
-    // METHODS
-    public Supplier create(final String code) {
-        final Supplier obj = new Supplier();
-        obj.setCode(code);
-        return repository.persist(obj);
-    }
-
     @Override
     public void persist(final Supplier entity) {
         repository.persist(entity);
@@ -41,6 +39,30 @@ public class SupplierService implements EntityService<Supplier> {
     @Override
     public void remove(final Supplier entity) {
         repository.remove(entity);
+    }
+
+    // METHODS
+    public Supplier create(final String code) {
+        final Supplier obj = new Supplier();
+        obj.setCode(code);
+        return repository.persist(obj);
+    }
+
+    public Resolved<Supplier> resolve(final String code) {
+        final Supplier existing = repository.getByCode(code);
+        final Supplier supplier = existing != null ? existing : new Supplier();
+        final boolean isNew = existing == null;
+
+        final List<ChangeLogEntry> changes = new ArrayList<>();
+
+        if (isNew) {
+            final ChangeLogEntry entry = ChangeLogEntry.added("code", null, code, "supplier");
+            changes.add(entry);
+            supplier.setCode(code);
+            repository.persist(supplier);
+        }
+
+        return new Resolved<>(supplier, changes);
     }
 
 }

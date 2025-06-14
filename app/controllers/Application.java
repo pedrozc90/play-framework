@@ -3,6 +3,7 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.objects.HealthDto;
 import controllers.objects.OrderDto;
+import controllers.objects.PurchaseOrderDto;
 import controllers.objects.RequestDto;
 import mappers.OrderMapper;
 import mappers.PurchaseOrderMapper;
@@ -62,6 +63,18 @@ public class Application extends Controller {
         final JsonNode response = Json.toJson(purchaseOrderMapper.toDto(purchaseOrder));
 
         return created(response);
+    }
+
+    @Transactional
+    public static Result getPurchaseOrder(final Long id) {
+        final PurchaseOrder po = purchaseOrderService.get(id);
+        if (po == null) {
+            return notFound("PurchaseOrder not found");
+        }
+
+        final PurchaseOrderDto dto = purchaseOrderMapper.toDto(po);
+        final JsonNode response = Json.toJson(dto);
+        return ok(response);
     }
 
 }

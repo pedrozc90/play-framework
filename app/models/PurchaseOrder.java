@@ -37,6 +37,11 @@ public class PurchaseOrder extends AuditEntity {
     @Column(name = "status", length = 32, nullable = false)
     private Status status = Status.WAITING;
 
+    @Lob
+    @Type(type = "org.hibernate.type.TextType")
+    @Column(name = "changelog", columnDefinition = "TEXT")
+    private String changelog;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
@@ -45,7 +50,7 @@ public class PurchaseOrder extends AuditEntity {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(final Long id) {
         this.id = id;
     }
 
@@ -53,7 +58,7 @@ public class PurchaseOrder extends AuditEntity {
         return number;
     }
 
-    public void setNumber(String poClientNumber) {
+    public void setNumber(final String poClientNumber) {
         this.number = poClientNumber;
     }
 
@@ -61,7 +66,7 @@ public class PurchaseOrder extends AuditEntity {
         return hash;
     }
 
-    public void setHash(String hash) {
+    public void setHash(final String hash) {
         this.hash = hash;
     }
 
@@ -69,7 +74,7 @@ public class PurchaseOrder extends AuditEntity {
         return content;
     }
 
-    public void setContent(String content) {
+    public void setContent(final String content) {
         this.content = content;
     }
 
@@ -77,15 +82,23 @@ public class PurchaseOrder extends AuditEntity {
         return status;
     }
 
-    public void setStatus(Status status) {
+    public void setStatus(final Status status) {
         this.status = status;
+    }
+
+    public String getChangelog() {
+        return changelog;
+    }
+
+    public void setChangelog(final String changelog) {
+        this.changelog = changelog;
     }
 
     public Order getOrder() {
         return order;
     }
 
-    public void setOrder(Order order) {
+    public void setOrder(final Order order) {
         this.order = order;
     }
 

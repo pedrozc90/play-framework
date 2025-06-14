@@ -17,6 +17,9 @@ public class OrderItem extends AuditEntity {
     @Column(name = "label_type", length = 32, nullable = false)
     private String labelType;
 
+    @Column(name = "cancelled", nullable = false)
+    private boolean cancelled = false;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "product_id", nullable = false)
     private Product product;
@@ -47,6 +50,14 @@ public class OrderItem extends AuditEntity {
 
     public void setLabelType(final String labelType) {
         this.labelType = labelType;
+    }
+
+    public boolean isCancelled() {
+        return cancelled;
+    }
+
+    public void setCancelled(final boolean cancelled) {
+        this.cancelled = cancelled;
     }
 
     public Product getProduct() {

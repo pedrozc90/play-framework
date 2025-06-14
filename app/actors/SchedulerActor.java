@@ -25,10 +25,11 @@ import java.util.concurrent.TimeUnit;
 public class SchedulerActor extends AbstractLoggingActor {
 
     private final ActorRef dispatcher;
-    private final PurchaseOrderService purchaseOrderService;
+
+    private final PurchaseOrderService purchaseOrderService = PurchaseOrderService.getInstance();
 
     public static Props props() {
-        return Props.create(SchedulerActor.class, () -> new SchedulerActor());
+        return Props.create(SchedulerActor.class, SchedulerActor::new);
     }
 
     /**
@@ -42,7 +43,6 @@ public class SchedulerActor extends AbstractLoggingActor {
 
     public SchedulerActor() {
         this.dispatcher = getContext().actorOf(DispatcherActor.props(5), "dispatcher");
-        this.purchaseOrderService = PurchaseOrderService.getInstance();
         receive(createReceive());
     }
 

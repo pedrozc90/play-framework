@@ -1,5 +1,6 @@
 # Routes
-GET     /                           controllers.Application.index()
-GET     /health                     controllers.Application.health()
-POST    /orders                     controllers.Application.order()
-GET     /orders/:id                 controllers.Application.getOrder(id: Long)
+GET         /                           controllers.Application.index()
+GET         /health                     controllers.Application.health()
+POST        /orders                     controllers.Application.order()
+GET         /purchase-orders/:id        controllers.Application.getPurchaseOrder(id: Long)
+GET         /orders/:id                 controllers.Application.getOrder(id: Long)
