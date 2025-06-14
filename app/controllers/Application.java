@@ -15,6 +15,7 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import services.OrderService;
 import services.PurchaseOrderService;
+import views.html.index;
 
 public class Application extends Controller {
 
@@ -24,8 +25,7 @@ public class Application extends Controller {
     private static final PurchaseOrderMapper purchaseOrderMapper = PurchaseOrderMapper.getInstance();
 
     public static Result index() {
-        // return ok(index.render("Your application is ready."));
-        return ok();
+        return ok(index.render("Home", "Your application is ready."));
     }
 
     public static Result health() {

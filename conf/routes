@@ -4,3 +4,5 @@ GET         /health                     controllers.Application.health()
 POST        /orders                     controllers.Application.order()
 GET         /purchase-orders/:id        controllers.Application.getPurchaseOrder(id: Long)
 GET         /orders/:id                 controllers.Application.getOrder(id: Long)
+
+GET         /assets/*file               controllers.Assets.at(path = "/public", file)
