@@ -1,6 +1,5 @@
 package repositories;
 
-import models.Order;
 import models.Supplier;
 import play.db.jpa.JPA;
 

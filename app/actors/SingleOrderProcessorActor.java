@@ -89,7 +89,7 @@ public class SingleOrderProcessorActor extends AbstractLoggingActor {
                 final List<PurchaseOrder> waiting = purchaseOrderService.findWaitingOrders(); // Ordered by ID ASC
                 for (PurchaseOrder po : waiting) {
                     po.setStatus(PurchaseOrder.Status.ONGOING);
-                    toEnqueue.add(new PurchaseOrderTuple(po));
+                    toEnqueue.add(PurchaseOrderTuple.of(po));
                     log().info("Marked PurchaseOrder {} as ONGOING", po.getId());
                 }
             });

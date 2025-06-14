@@ -1,11 +1,8 @@
 package mappers;
 
-import actors.objects.ChangeLog;
 import actors.objects.ChangeLogDto;
-import com.fasterxml.jackson.databind.JsonNode;
 import controllers.objects.PurchaseOrderDto;
 import models.PurchaseOrder;
-import play.libs.Json;
 
 public class PurchaseOrderMapper implements EntityMapper<PurchaseOrder, PurchaseOrderDto> {
 

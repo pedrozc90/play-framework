@@ -1,5 +1,8 @@
 package models;
 
+import lombok.Data;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.Column;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
@@ -8,6 +11,8 @@ import java.io.Serializable;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Data
+@NoArgsConstructor
 @MappedSuperclass
 @EntityListeners(value = { AutitListener.class })
 public abstract class AuditEntity implements Serializable {
@@ -24,37 +29,5 @@ public abstract class AuditEntity implements Serializable {
     @Version
     @Column(name = "version", nullable = false)
     private Integer version = 0;
-
-    public String getUuid() {
-        return uuid;
-    }
-
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
-    }
-
-    public Timestamp getInsertedAt() {
-        return insertedAt;
-    }
-
-    public void setInsertedAt(Timestamp insertedAt) {
-        this.insertedAt = insertedAt;
-    }
-
-    public Timestamp getUpdatedAt() {
-        return updatedAt;
-    }
-
-    public void setUpdatedAt(Timestamp updatedAt) {
-        this.updatedAt = updatedAt;
-    }
-
-    public Integer getVersion() {
-        return version;
-    }
-
-    public void setVersion(Integer version) {
-        this.version = version;
-    }
 
 }

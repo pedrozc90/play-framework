@@ -1,7 +1,11 @@
 package controllers.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
 public class OrderItemDto {
 
     @JsonProperty(value = "id")
@@ -15,37 +19,5 @@ public class OrderItemDto {
 
     @JsonProperty(value = "product", required = true)
     private ProductDto product;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(final Integer quantity) {
-        this.quantity = quantity;
-    }
-
-    public String getLabelType() {
-        return labelType;
-    }
-
-    public void setLabelType(final String labelType) {
-        this.labelType = labelType;
-    }
-
-    public ProductDto getProduct() {
-        return product;
-    }
-
-    public void setProduct(final ProductDto product) {
-        this.product = product;
-    }
 
 }

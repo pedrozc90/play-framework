@@ -1,8 +1,15 @@
 package models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
     name = "products",
@@ -26,45 +33,5 @@ public class Product extends AuditEntity implements Serializable {
 
     @Column(name = "color", length = 64)
     private String color;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getEan() {
-        return ean;
-    }
-
-    public void setEan(final String ean) {
-        this.ean = ean;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(final String description) {
-        this.description = description;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(final String size) {
-        this.size = size;
-    }
-
-    public String getColor() {
-        return color;
-    }
-
-    public void setColor(final String color) {
-        this.color = color;
-    }
 
 }

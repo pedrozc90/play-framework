@@ -1,10 +1,16 @@
 package models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "purchase_orders")
 public class PurchaseOrder extends AuditEntity {
@@ -45,61 +51,5 @@ public class PurchaseOrder extends AuditEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id")
     private Order order;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(final String poClientNumber) {
-        this.number = poClientNumber;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(final String hash) {
-        this.hash = hash;
-    }
-
-    public String getContent() {
-        return content;
-    }
-
-    public void setContent(final String content) {
-        this.content = content;
-    }
-
-    public Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(final Status status) {
-        this.status = status;
-    }
-
-    public String getChangelog() {
-        return changelog;
-    }
-
-    public void setChangelog(final String changelog) {
-        this.changelog = changelog;
-    }
-
-    public Order getOrder() {
-        return order;
-    }
-
-    public void setOrder(final Order order) {
-        this.order = order;
-    }
 
 }

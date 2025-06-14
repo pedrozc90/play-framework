@@ -3,7 +3,9 @@ package actors.objects;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
+@Getter
 public class ChangeLogEntry {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING)
@@ -41,33 +43,17 @@ public class ChangeLogEntry {
         this.entityRef = entityRef;
     }
 
-    public Type getType() {
-        return type;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getOldValue() {
-        return oldValue;
-    }
-
-    public String getNewValue() {
-        return newValue;
-    }
-
-    public String getEntityRef() {
-        return entityRef;
-    }
-
     public String toText() {
         if (type == null) return null;
         switch (type) {
-            case ADDED: return String.format("added with %s = '%s'", field, newValue);
-            case CHANGED: return String.format("changed %s from '%s' to '%s'", field, oldValue, newValue);
-            case REMOVED: return String.format("removed %s = '%s'", field, oldValue);
-            default: return null;
+            case ADDED:
+                return String.format("added with %s = '%s'", field, newValue);
+            case CHANGED:
+                return String.format("changed %s from '%s' to '%s'", field, oldValue, newValue);
+            case REMOVED:
+                return String.format("removed %s = '%s'", field, oldValue);
+            default:
+                return null;
         }
     }
 

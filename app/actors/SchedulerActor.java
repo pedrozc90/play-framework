@@ -119,7 +119,7 @@ public class SchedulerActor extends AbstractLoggingActor {
         if (purchaseOrder != null && purchaseOrder.getStatus() == PurchaseOrder.Status.WAITING) {
             purchaseOrder.setStatus(PurchaseOrder.Status.ONGOING);
             log().info("PurchaseOrder {} updated to ONGOING", purchaseOrder.getId());
-            return new PurchaseOrderTuple(purchaseOrder);
+            return PurchaseOrderTuple.of(purchaseOrder);
         }
         return null;
     }

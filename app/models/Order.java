@@ -1,10 +1,17 @@
 package models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(name = "orders")
 public class Order extends AuditEntity implements Serializable {
@@ -26,45 +33,5 @@ public class Order extends AuditEntity implements Serializable {
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true)
     private Set<OrderItem> items = new HashSet<>();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(final String poClientNumber) {
-        this.number = poClientNumber;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(final String status) {
-        this.status = status;
-    }
-
-    public Supplier getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(final Supplier supplier) {
-        this.supplier = supplier;
-    }
-
-    public Set<OrderItem> getItems() {
-        return items;
-    }
-
-    public void setItems(final Set<OrderItem> items) {
-        this.items = items;
-    }
 
 }

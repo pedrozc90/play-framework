@@ -1,8 +1,15 @@
 package models;
 
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(callSuper = true)
 @Entity
 @Table(
     name = "suppliers",
@@ -17,21 +24,5 @@ public class Supplier extends AuditEntity implements Serializable {
 
     @Column(name = "code", length = 32, nullable = false, unique = true)
     private String code;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(final String code) {
-        this.code = code;
-    }
 
 }

@@ -54,6 +54,9 @@ libraryDependencies ++= Seq(
     "com.mysema.querydsl" % "querydsl-jpa" % "3.6.3",
     "com.mysema.querydsl" % "querydsl-apt" % "3.6.3",
 
+    // Lombok
+    "org.projectlombok" % "lombok" % "1.18.32" % "provided",
+
     // Testing
     "junit" % "junit" % "4.12" % Test,
     "com.typesafe.play" %% "play-test" % "2.3.9" % Test,

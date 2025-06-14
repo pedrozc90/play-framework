@@ -1,9 +1,13 @@
 package controllers.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
 public class SupplierDto implements Serializable {
 
     @JsonProperty(value = "id")
@@ -11,21 +15,5 @@ public class SupplierDto implements Serializable {
 
     @JsonProperty(value = "code", required = true)
     private String code;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(final String code) {
-        this.code = code;
-    }
 
 }

@@ -2,10 +2,12 @@ package actors.objects;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Getter
 public class ChangeLogDto {
 
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
@@ -18,10 +20,6 @@ public class ChangeLogDto {
 
     public ChangeLogDto() {
         this(new ArrayList<>());
-    }
-
-    public List<ChangeLogEntryDto> getChanges() {
-        return changes;
     }
 
 }

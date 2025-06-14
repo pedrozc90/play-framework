@@ -2,7 +2,9 @@ package actors.objects;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
+@Getter
 public class ChangeLogEntryDto {
 
     @JsonProperty(value = "field")
@@ -16,14 +18,6 @@ public class ChangeLogEntryDto {
                              @JsonProperty(value = "change") final String change) {
         this.field = field;
         this.change = change;
-    }
-
-    public String getField() {
-        return field;
-    }
-
-    public String getChange() {
-        return change;
     }
 
 }

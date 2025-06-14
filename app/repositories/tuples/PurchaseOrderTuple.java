@@ -1,10 +1,14 @@
 package repositories.tuples;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import models.PurchaseOrder;
 
 import javax.persistence.Column;
 import java.util.Objects;
 
+@Data
+@AllArgsConstructor
 public class PurchaseOrderTuple {
 
     @Column(name = "id")
@@ -13,29 +17,8 @@ public class PurchaseOrderTuple {
     @Column(name = "number")
     private String number;
 
-    public PurchaseOrderTuple(final Long id, final String number) {
-        this.id = id;
-        this.number = number;
-    }
-
-    public PurchaseOrderTuple(final PurchaseOrder entity) {
-        this(entity.getId(), entity.getNumber());
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
+    public static PurchaseOrderTuple of(final PurchaseOrder entity) {
+        return new PurchaseOrderTuple(entity.getId(), entity.getNumber());
     }
 
     @Override

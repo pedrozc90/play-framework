@@ -1,13 +1,16 @@
 package controllers.objects;
 
-import actors.objects.ChangeLog;
 import actors.objects.ChangeLogDto;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import models.PurchaseOrder;
 
 import java.io.Serializable;
 
+@Data
+@NoArgsConstructor
 public class PurchaseOrderDto implements Serializable {
 
     @JsonProperty(value = "id")
@@ -28,53 +31,5 @@ public class PurchaseOrderDto implements Serializable {
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty(value = "order", required = true)
     private OrderDto order;
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(final Long id) {
-        this.id = id;
-    }
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(final String number) {
-        this.number = number;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(final String hash) {
-        this.hash = hash;
-    }
-
-    public PurchaseOrder.Status getStatus() {
-        return status;
-    }
-
-    public void setStatus(final PurchaseOrder.Status status) {
-        this.status = status;
-    }
-
-    public ChangeLogDto getChangelog() {
-        return changelog;
-    }
-
-    public void setChangelog(final ChangeLogDto changelog) {
-        this.changelog = changelog;
-    }
-
-    public OrderDto getOrder() {
-        return order;
-    }
-
-    public void setOrder(final OrderDto order) {
-        this.order = order;
-    }
 
 }
