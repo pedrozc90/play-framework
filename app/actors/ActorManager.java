@@ -25,9 +25,16 @@ public class ActorManager {
     }
 
     private static void createActors(final ActorSystem system) {
-        initSchedulerActor(system);
+        initSupervisorActor(system);
+        // initSchedulerActor(system);
         // initSingleProcessorActor(system);
-        logger.info("ActorManager initialized with scheduler");
+        logger.info("Initializing actors ...");
+    }
+
+    private static void initSupervisorActor(final ActorSystem system) {
+        // Create the scheduler actor with supervision strategy
+        final ActorRef ref = system.actorOf(SupervisorActor.props(), "SupervisorActor");
+        actors.put(SchedulerActor.class, ref);
     }
 
     private static void initSchedulerActor(final ActorSystem system) {
