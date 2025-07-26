@@ -37,3 +37,24 @@ target                   → Generated stuff
     └ src_managed        → Generated sources (templates, ...)
 test                     → source folder for unit or functional tests
 ```
+
+## Requirements
+
+### Sbt 0.13.18
+
+```bash
+# download sbt-launch.jar for sbt 0.13.18
+wget https://github.com/sbt/sbt/releases/download/v0.13.18/sbt-0.13.18.tgz
+```
+
+```bash
+# create sbt folder
+mkdir -pv ~/.local/share/sbt
+
+# extract it
+tar -zxf sbt-0.13.18.tgz -C ~/.local/share/sbt --strip-components=1
+
+chmod +x ~/.local/share/sbt/bin/sbt
+
+echo 'export PATH="$HOME/.local/share/sbt/bin:$PATH"' >> ~/.bashrc
+```

@@ -1,6 +1,7 @@
 package actors;
 
 import akka.actor.*;
+import akka.japi.pf.DeciderBuilder;
 import akka.japi.pf.ReceiveBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -17,11 +18,11 @@ import java.util.concurrent.TimeUnit;
 
 public class SupervisorActor extends AbstractLoggingActor {
 
+    private final long HEARTBEAT_THRESHOLD = 2 * 60 * 1000; // 2 minutes
     private final Set<ActorRef> workers = Collections.newSetFromMap(new ConcurrentHashMap<>());
-    private final Map<ActorRef, Long> activities = new ConcurrentHashMap<>();
+    private final Map<ActorRef, Long> heartbeats = new ConcurrentHashMap<>();
 
     private Cancellable heartbeatTask;
-    private long heartbeatThreshold = 2 * 60 * 1000; // 2 minutes
 
     public SupervisorActor() {
         receive(createReceive());
@@ -46,13 +47,11 @@ public class SupervisorActor extends AbstractLoggingActor {
     }
 
     private OneForOneStrategy strategy() {
-        return new OneForOneStrategy(
-            5,
-            Duration.create(1, TimeUnit.MINUTES),
-            (t) -> {
-                return SupervisorStrategy.restart();
-            }
-        );
+        final FiniteDuration interval = Duration.create(1, TimeUnit.MINUTES);
+        final PartialFunction<Throwable, SupervisorStrategy.Directive> decider = DeciderBuilder
+            .match(Exception.class, (e) -> SupervisorStrategy.restart())
+            .build();
+        return new OneForOneStrategy(5, interval, decider);
     }
 
     private PartialFunction<Object, BoxedUnit> createReceive() {
@@ -65,7 +64,7 @@ public class SupervisorActor extends AbstractLoggingActor {
             .build();
     }
 
-    private Cancellable createScheduler() {
+    private Cancellable createHeartbeatTask() {
         final FiniteDuration delay = Duration.create(60, TimeUnit.SECONDS);
         final FiniteDuration interval = Duration.create(60, TimeUnit.SECONDS);
         return context().system().scheduler().schedule(
@@ -80,7 +79,7 @@ public class SupervisorActor extends AbstractLoggingActor {
 
     private void scheduleHeartbeatTask() {
         log().debug("Scheduling heartbeat task");
-        heartbeatTask = createScheduler();
+        heartbeatTask = createHeartbeatTask();
     }
 
     private void onInit(final Init obj) {
@@ -91,9 +90,9 @@ public class SupervisorActor extends AbstractLoggingActor {
     private void onHeartbeat(final Heartbeat obj) {
         final long now = System.currentTimeMillis();
         workers.forEach((ref) -> {
-            final long prev = activities.getOrDefault(ref, 0L);
+            final long prev = heartbeats.getOrDefault(ref, 0L);
             final long timeout = now - prev;
-            if (timeout > heartbeatThreshold) {
+            if (timeout > HEARTBEAT_THRESHOLD) {
                 log().info("Restarting actor {} due to missing heartbeat", ref);
 
                 // stop actor
@@ -111,10 +110,10 @@ public class SupervisorActor extends AbstractLoggingActor {
     private void onHeartbeatAck(final HeartbeatAck obj) {
         final ActorRef ref = obj.actor;
         if (ref != null && workers.contains(ref)) {
-            activities.put(ref, System.currentTimeMillis());
+            heartbeats.put(ref, System.currentTimeMillis());
         } else {
             log().warning("Received heartbeat ack from unknown actor {}", ref);
-            activities.remove(ref);
+            heartbeats.remove(ref);
         }
     }
 
@@ -131,7 +130,7 @@ public class SupervisorActor extends AbstractLoggingActor {
         final ActorRef ref = context().actorOf(PeriodicActor.props());
         context().watch(ref);
         workers.add(ref);
-        activities.put(ref, System.currentTimeMillis());
+        heartbeats.put(ref, System.currentTimeMillis());
         return ref;
     }
 
@@ -139,7 +138,7 @@ public class SupervisorActor extends AbstractLoggingActor {
         context().stop(ref);
         context().unwatch(ref);
         workers.remove(ref);
-        activities.remove(ref);
+        heartbeats.remove(ref);
     }
 
     /**

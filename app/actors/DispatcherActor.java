@@ -16,30 +16,6 @@ public class DispatcherActor extends AbstractLoggingActor {
     private final Queue<PurchaseOrderTuple> queue = new LinkedList<>();
     private final Map<String, ActorRef> workers = new HashMap<>();
 
-    public static Props props(final int num) {
-        return Props.create(DispatcherActor.class, () -> new DispatcherActor(num));
-    }
-
-    public static class Enqueue {
-
-        public final PurchaseOrderTuple tuple;
-
-        public Enqueue(final PurchaseOrderTuple tuple) {
-            this.tuple = tuple;
-        }
-
-    }
-
-    public static class Dequeue {
-
-        public final PurchaseOrderTuple tuple;
-
-        public Dequeue(final PurchaseOrderTuple tuple) {
-            this.tuple = tuple;
-        }
-
-    }
-
     public DispatcherActor(final int num) {
         this.num = num;
         receive(createReceive());
@@ -119,6 +95,36 @@ public class DispatcherActor extends AbstractLoggingActor {
         if (workerRef != null) getContext().stop(workerRef);
 
         dispatch();
+    }
+
+    /**
+     * Api
+     **/
+    public static Props props(final int num) {
+        return Props.create(DispatcherActor.class, () -> new DispatcherActor(num));
+    }
+
+    /**
+     * Messages
+     **/
+    public static class Enqueue {
+
+        public final PurchaseOrderTuple tuple;
+
+        public Enqueue(final PurchaseOrderTuple tuple) {
+            this.tuple = tuple;
+        }
+
+    }
+
+    public static class Dequeue {
+
+        public final PurchaseOrderTuple tuple;
+
+        public Dequeue(final PurchaseOrderTuple tuple) {
+            this.tuple = tuple;
+        }
+
     }
 
 }
