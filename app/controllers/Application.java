@@ -3,26 +3,45 @@ package controllers;
 import com.fasterxml.jackson.databind.JsonNode;
 import controllers.objects.HealthDto;
 import controllers.objects.OrderDto;
+import controllers.objects.PurchaseOrderDto;
+import controllers.objects.RequestDto;
+import mappers.OrderMapper;
+import mappers.PurchaseOrderMapper;
+import models.Order;
 import models.PurchaseOrder;
 import play.db.jpa.Transactional;
 import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Result;
+import services.OrderService;
 import services.PurchaseOrderService;
-import utils.mappers.PurchaseOrderMapper;
+import views.html.index;
 
 public class Application extends Controller {
 
-    private static final PurchaseOrderService service = PurchaseOrderService.getInstance();
-    private static final PurchaseOrderMapper mapper = PurchaseOrderMapper.getInstance();
+    private static final OrderService orderService = OrderService.getInstance();
+    private static final PurchaseOrderService purchaseOrderService = PurchaseOrderService.getInstance();
+    private static final OrderMapper orderMapper = OrderMapper.getInstance();
+    private static final PurchaseOrderMapper purchaseOrderMapper = PurchaseOrderMapper.getInstance();
 
     public static Result index() {
-        // return ok(index.render("Your application is ready."));
-        return ok();
+        return ok(index.render("Home", "Your application is ready."));
     }
 
     public static Result health() {
         final HealthDto dto = new HealthDto();
+        final JsonNode response = Json.toJson(dto);
+        return ok(response);
+    }
+
+    @Transactional
+    public static Result getOrder(final Long id) {
+        final Order order = orderService.get(id);
+        if (order == null) {
+            return notFound("Order not found");
+        }
+
+        final OrderDto dto = orderMapper.toDto(order);
         final JsonNode response = Json.toJson(dto);
         return ok(response);
     }
@@ -34,16 +53,28 @@ public class Application extends Controller {
             return badRequest("Expecting Json data");
         }
 
-        final OrderDto dto = Json.fromJson(body, OrderDto.class);
+        final RequestDto dto = Json.fromJson(body, RequestDto.class);
         if (dto == null) {
             return badRequest("Invalid Json data");
         }
 
-        final PurchaseOrder purchaseOrder = service.create(dto.getNumber(), body.asText());
+        final PurchaseOrder purchaseOrder = purchaseOrderService.create(dto.getNumber(), body.toPrettyString());
 
-        final JsonNode response = Json.toJson(mapper.toDto(purchaseOrder));
+        final JsonNode response = Json.toJson(purchaseOrderMapper.toDto(purchaseOrder));
 
         return created(response);
+    }
+
+    @Transactional
+    public static Result getPurchaseOrder(final Long id) {
+        final PurchaseOrder po = purchaseOrderService.get(id);
+        if (po == null) {
+            return notFound("PurchaseOrder not found");
+        }
+
+        final PurchaseOrderDto dto = purchaseOrderMapper.toDto(po);
+        final JsonNode response = Json.toJson(dto);
+        return ok(response);
     }
 
 }

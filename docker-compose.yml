@@ -1,0 +1,36 @@
+services:
+    db:
+        image: postgres:16-alpine
+        container_name: postgres
+        hostname: postgres
+        restart: unless-stopped
+        ports:
+            - "5432:5432"
+        environment:
+            POSTGRES_USERNAME: quarkus
+            POSTGRES_PASSWORD: quarkus
+        volumes:
+            - postgres_data:/var/lib/postgresql/data
+            - $PWD/docs/.postgres/init.sql:/docker-entrypoint-initdb.d/init.sql
+        networks:
+            - quarkus_network
+        command:
+            - "postgres"
+            - "-c"
+            - "shared_preload_libraries=pg_stat_statements"
+            - "-c"
+            - "pg_stat_statements.track=all"
+            - "-c"
+            - "pg_stat_statements.max=10000"
+            - "-c"
+            - "track_activity_query_size=2048"
+
+volumes:
+    postgres_data:
+        name: postgres_data
+        driver: local
+
+networks:
+    quarkus_network:
+        name: quarkus_network
+        driver: bridge

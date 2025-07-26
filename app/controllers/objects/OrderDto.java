@@ -1,54 +1,29 @@
 package controllers.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 import java.util.Set;
 
+@Data
+@NoArgsConstructor
 public class OrderDto implements Serializable {
+
+    @JsonProperty(value = "id")
+    private Long id;
 
     @JsonProperty(value = "number", required = true)
     private String number;
 
-    @JsonProperty(value = "supplier", required = true)
-    private String supplier;
-
     @JsonProperty(value = "status", required = true)
     private String status;
 
+    @JsonProperty(value = "supplier")
+    private SupplierDto supplier;
+
     @JsonProperty(value = "items", required = true)
     private Set<OrderItemDto> items;
-
-    public String getNumber() {
-        return number;
-    }
-
-    public void setNumber(String number) {
-        this.number = number;
-    }
-
-    public String getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(String supplier) {
-        this.supplier = supplier;
-    }
-
-    public String getStatus() {
-        return status;
-    }
-
-    public void setStatus(String status) {
-        this.status = status;
-    }
-
-    public Set<OrderItemDto> getItems() {
-        return items;
-    }
-
-    public void setItems(Set<OrderItemDto> items) {
-        this.items = items;
-    }
 
 }

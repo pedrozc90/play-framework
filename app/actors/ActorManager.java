@@ -4,30 +4,61 @@ import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import play.Logger;
 import play.libs.Akka;
-import repositories.PurchaseOrderRepository;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class ActorManager {
 
     private static final Logger.ALogger logger = Logger.of(ActorManager.class);
 
-    private static ActorRef schedulerActor;
+    private static Map<Class<?>, ActorRef> actors = new HashMap<>();
 
     public static void init() {
         final ActorSystem system = Akka.system();
 
-        final PurchaseOrderRepository repository = new PurchaseOrderRepository();
-
-        // Create the scheduler actor with supervision strategy
-        schedulerActor = system.actorOf(SchedulerActor.props(repository), "SchedulerActor");
-
-        // Start the scheduler by sending initial message
-        schedulerActor.tell(SchedulerActor.CheckOrders.INSTANCE, null);
-
-        logger.info("ActorManager initialized with scheduler");
+        final FiniteDuration delay = Duration.create(10, TimeUnit.SECONDS);
+        system.scheduler().scheduleOnce(delay, () -> createActors(system), system.dispatcher());
     }
 
-    public static ActorRef getSchedulerActor() {
-        return schedulerActor;
+    private static void createActors(final ActorSystem system) {
+        initSupervisorActor(system);
+        // initSchedulerActor(system);
+        // initSingleProcessorActor(system);
+        logger.info("Initializing actors ...");
+    }
+
+    private static void initSupervisorActor(final ActorSystem system) {
+        // Create the scheduler actor with supervision strategy
+        final ActorRef ref = system.actorOf(SupervisorActor.props(), "SupervisorActor");
+        actors.put(SchedulerActor.class, ref);
+    }
+
+    private static void initSchedulerActor(final ActorSystem system) {
+        // Create the scheduler actor with supervision strategy
+        final ActorRef ref = system.actorOf(SchedulerActor.props(), "SchedulerActor");
+
+        // Start the scheduler by sending initial message
+        ref.tell(new SchedulerActor.ResumeOngoingOrders(), ActorRef.noSender());
+
+        actors.put(SchedulerActor.class, ref);
+    }
+
+    private static void initSingleProcessorActor(final ActorSystem system) {
+        // Create the scheduler actor with supervision strategy
+        final ActorRef ref = system.actorOf(SingleOrderProcessorActor.props(), "SingleOrderProcessorActor");
+
+        // Start the scheduler by sending initial message
+        ref.tell(new SingleOrderProcessorActor.Tick(), ActorRef.noSender());
+
+        actors.put(SchedulerActor.class, ref);
+    }
+
+    public static ActorRef actor(final Class<?> clazz) {
+        return actors.get(clazz);
     }
 
 }

@@ -1,20 +1,23 @@
 package services;
 
-import controllers.objects.OrderDto;
-import controllers.objects.OrderItemDto;
+import actors.objects.ChangeLogEntry;
+import actors.objects.Resolved;
+import mappers.OrderMapper;
 import models.Order;
-import models.OrderItem;
+import models.Supplier;
 import repositories.OrderRepository;
 
-import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Objects;
 
-public class OrderService {
+public class OrderService implements EntityService<Order> {
 
     private static OrderService instance;
 
     private static final OrderRepository repository = OrderRepository.getInstance();
+    private static final OrderMapper orderMapper = OrderMapper.getInstance();
     private static final OrderItemService orderItemService = OrderItemService.getInstance();
+    private static final SupplierService supplierService = SupplierService.getInstance();
 
     public static OrderService getInstance() {
         if (instance == null) {
@@ -23,25 +26,67 @@ public class OrderService {
         return instance;
     }
 
-    public Order create(final String poClientNumber, final String supplierId, final String status) {
-        final Order obj = new Order();
-        obj.setStatus(status);
-        obj.setNumber(poClientNumber);
-        obj.setSupplier(supplierId);
-        return repository.persist(obj);
+    // QUERIES
+    public Order get(final Long id) {
+        return repository.findById(id);
     }
 
-    public Order create(final OrderDto dto) {
-        final String labelType = dto.getItems().stream()
-            .map(OrderItemDto::getLabelType)
-            .collect(Collectors.joining(", "));
+    public Order get(final String number) {
+        return repository.getByNumber(number);
+    }
 
-        final Order order = create(dto.getNumber(), dto.getSupplier(), labelType);
+    @Override
+    public Order save(final Order entity) {
+        return repository.merge(entity);
+    }
 
-        final Set<OrderItem> items = orderItemService.create(dto.getItems(), order);
+    @Override
+    public void remove(final Order entity) {
+        repository.remove(entity);
+    }
 
-        order.setItems(items);
-        return order;
+    @Override
+    public void persist(final Order entity) {
+        repository.persist(entity);
+    }
+
+    // METHODS
+    public Resolved<Order> resolve(final String number, final String status, final Supplier supplier) {
+        final Order existing = repository.getByNumber(number);
+        final Order order = existing != null ? existing : new Order();
+        final boolean isNew = (existing == null);
+
+        final ArrayList<ChangeLogEntry> changes = new ArrayList<>();
+
+        if (isNew) {
+            final ChangeLogEntry entry = ChangeLogEntry.added("number", null, number, "number");
+            changes.add(entry);
+            order.setNumber(number);
+        }
+
+        if (!Objects.equals(order.getStatus(), status)) {
+            if (order.getStatus() != null) {
+                final ChangeLogEntry entry = ChangeLogEntry.changed("status", order.getStatus(), status, "status");
+                changes.add(entry);
+            }
+            order.setStatus(status);
+        }
+
+        if (order.getSupplier() == null) {
+            final ChangeLogEntry entry = ChangeLogEntry.added("supplier", null, supplier.getCode(), "supplier");
+            changes.add(entry);
+            order.setSupplier(supplier);
+        } else if (order.getSupplier() != supplier) {
+            final ChangeLogEntry entry = ChangeLogEntry.changed("supplier", order.getSupplier().getCode(), supplier.getCode(), "supplier");
+            changes.add(entry);
+            order.setSupplier(supplier);
+        }
+
+        if (isNew) {
+            repository.persist(order);
+        }
+
+        return new Resolved<>(order, changes);
     }
 
 }
