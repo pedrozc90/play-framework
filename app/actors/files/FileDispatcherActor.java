@@ -6,15 +6,12 @@ import actors.messages.Init;
 import actors.shared.BaseActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.japi.pf.ReceiveBuilder;
 import akka.routing.RoundRobinPool;
 import lombok.Data;
 import models.files.FileStorage;
 import models.jobs.Job;
 import models.tasks.Task;
-import play.db.jpa.JPA;
-import scala.PartialFunction;
-import scala.runtime.BoxedUnit;
+import play.db.jpa.JPAApi;
 import services.FileStorageService;
 import services.JobService;
 import services.TaskService;
@@ -28,6 +25,7 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FileDispatcherActor extends BaseActor {
 
+    private final JPAApi jpa;
     private final JobService jobService;
     private final TaskService taskService;
     private final FileStorageService fsService;
@@ -37,11 +35,13 @@ public class FileDispatcherActor extends BaseActor {
     private final int parallelism;
     private ActorRef router;
 
-    public FileDispatcherActor(final JobService jobService,
+    public FileDispatcherActor(final JPAApi jpa,
+                               final JobService jobService,
                                final TaskService taskService,
                                final FileStorageService fsService,
                                final int parallelism) {
         super();
+        this.jpa = jpa;
         this.jobService = jobService;
         this.taskService = taskService;
         this.fsService = fsService;
@@ -49,8 +49,8 @@ public class FileDispatcherActor extends BaseActor {
     }
 
     @Override
-    protected PartialFunction<Object, BoxedUnit> createReceive() {
-        return ReceiveBuilder
+    public Receive createReceive() {
+        return receiveBuilder()
             .match(Init.class, this::onInit)
             .match(Enqueue.class, this::onEnqueue)
             .match(Dequeue.class, this::onDequeue)
@@ -63,12 +63,13 @@ public class FileDispatcherActor extends BaseActor {
     @Override
     protected void onInit(Init obj) {
         super.onInit(obj);
-        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(taskService, fsService, self())));
+        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(jpa, taskService, fsService, self())));
     }
 
     private void onEnqueue(final Enqueue cmd) {
         logger.info("Received enqueue command: {}", cmd);
-        JPA.withTransaction(() -> {
+
+        jpa.withTransaction(() -> {
             final Job job = jobService.get(cmd.jobId);
             if (job == null) {
                 logger.error("Job {} not found", cmd.jobId);
@@ -117,11 +118,12 @@ public class FileDispatcherActor extends BaseActor {
     }
 
     // PROPS
-    public static Props props(final JobService jobService,
+    public static Props props(final JPAApi api,
+                              final JobService jobService,
                               final TaskService taskService,
                               final FileStorageService fsService,
                               final int parallelism) {
-        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(jobService, taskService, fsService, parallelism));
+        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(api, jobService, taskService, fsService, parallelism));
     }
 
     @Data

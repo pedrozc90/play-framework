@@ -1,6 +1,5 @@
 import actors.SupervisorActor;
 import com.google.inject.AbstractModule;
-import core.play.filters.Filters;
 import play.Logger;
 import play.libs.akka.AkkaGuiceSupport;
 
@@ -11,9 +10,10 @@ public class ApplicationModule extends AbstractModule implements AkkaGuiceSuppor
 
     @Override
     protected void configure() {
-        logger.info("Configuring module");
+        logger.info("Configuring bindings...");
+
+        // eager singletons are created immediately at startup
         bind(ApplicationStart.class).asEagerSingleton();
-        bind(Filters.class).asEagerSingleton();
 
         // actors
         bindActor(SupervisorActor.class, "SupervisorActor");
