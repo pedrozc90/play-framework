@@ -3,6 +3,9 @@ package core.play.filters;
 import play.api.mvc.Result;
 import scala.Tuple2;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class CorsFilter extends PlayFilter {
 
     @Override

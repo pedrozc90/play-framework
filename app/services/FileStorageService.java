@@ -5,22 +5,17 @@ import core.utils.HashUtils;
 import models.files.FileStorage;
 import repositories.FileStorageRepository;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
+@Singleton
 public class FileStorageService {
 
-    private static FileStorageService instance;
-
-    private final FileStorageRepository repository = FileStorageRepository.getInstance();
-
-    public static FileStorageService getInstance() {
-        if (instance == null) {
-            instance = new FileStorageService();
-        }
-        return instance;
-    }
+    @Inject
+    private FileStorageRepository repository;
 
     // QUERY
     public FileStorage get(final UUID uuid) {

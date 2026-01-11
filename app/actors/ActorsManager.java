@@ -2,38 +2,29 @@ package actors;
 
 import actors.files.FileDispatcherActor;
 import akka.actor.ActorRef;
-import akka.actor.ActorSystem;
-import lombok.Data;
 import models.jobs.Job;
 import play.Logger;
-import play.libs.Akka;
 
-@Data
+import javax.inject.Inject;
+import javax.inject.Named;
+import javax.inject.Provider;
+import javax.inject.Singleton;
+
+@Singleton
 public class ActorsManager {
 
     private final Logger.ALogger logger = Logger.of(ActorsManager.class);
 
-    private static ActorsManager instance;
+    private final Provider<ActorRef> supervisorActorProvider;
 
-    private ActorRef supervisor;
-
-    public static ActorsManager getInstance() {
-        if (instance == null) {
-            instance = new ActorsManager();
-        }
-        return instance;
-    }
-
-    public void init() {
-        final ActorSystem system = Akka.system();
-        supervisor = createSupervisorActor(system);
-    }
-
-    private ActorRef createSupervisorActor(final ActorSystem system) {
-        return system.actorOf(SupervisorActor.props(), "SupervisorActor");
+    @Inject
+    public ActorsManager(@Named("SupervisorActor") final Provider<ActorRef> supervisorActorProvider) {
+        this.supervisorActorProvider = supervisorActorProvider;
     }
 
     public void queue(final Job job) {
+        logger.info("Queueing job {}", job.getId());
+        final ActorRef supervisor = supervisorActorProvider.get();
         final FileDispatcherActor.Enqueue enqueue = new FileDispatcherActor.Enqueue(job.getId());
         final SupervisorActor.Forward forward = new SupervisorActor.Forward(FileDispatcherActor.class, enqueue);
         supervisor.tell(forward, ActorRef.noSender());

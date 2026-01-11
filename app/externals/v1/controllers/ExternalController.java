@@ -3,21 +3,24 @@ package externals.v1.controllers;
 import play.mvc.Controller;
 import play.mvc.Result;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class ExternalController extends Controller {
 
-    public static Result get() {
+    public Result get() {
         return ok();
     }
 
-    public static Result post() {
+    public Result post() {
         return ok();
     }
 
-    public static Result put() {
+    public Result put() {
         return ok();
     }
 
-    public static Result delete() {
+    public Result delete() {
         return TODO;
     }
 

@@ -1,5 +1,3 @@
-import play.PlayJava
-
 name := "play-boilerplate"
 
 version := "1.0.0"
@@ -22,6 +20,7 @@ libraryDependencies ++= Seq(
     javaJdbc,
     javaJpa,
     javaWs,
+    evolutions,
 
     // JSON processing
     "com.fasterxml.jackson.core" % "jackson-core" % "2.14.0",

@@ -2,23 +2,19 @@ package repositories;
 
 import core.persistence.JpaRepository;
 import models.files.FileStorage;
+import play.db.jpa.JPAApi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.NoResultException;
 import java.util.UUID;
 
+@Singleton
 public class FileStorageRepository extends JpaRepository<FileStorage, Long> {
 
-    private static FileStorageRepository instance;
-
-    public static FileStorageRepository getInstance() {
-        if (instance == null) {
-            instance = new FileStorageRepository();
-        }
-        return instance;
-    }
-
-    public FileStorageRepository() {
-        super(FileStorage.class);
+    @Inject
+    public FileStorageRepository(final JPAApi jpaApi) {
+        super(FileStorage.class, jpaApi);
     }
 
     public FileStorage get(final UUID uuid) {

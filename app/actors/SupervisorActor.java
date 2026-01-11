@@ -14,7 +14,11 @@ import scala.PartialFunction;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
 import scala.runtime.BoxedUnit;
+import services.FileStorageService;
+import services.JobService;
+import services.TaskService;
 
+import javax.inject.Inject;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
@@ -27,10 +31,23 @@ public class SupervisorActor extends BaseActor {
     private final Map<ActorRef, Class<?>> classes = new ConcurrentHashMap<>();
     private final Map<ActorRef, Long> heartbeats = new ConcurrentHashMap<>();
 
+    private final JobService jobService;
+    private final TaskService taskService;
+    private final FileStorageService fsService;
+
     private Cancellable heartbeat;
 
-    public SupervisorActor() {
+    // Guice injects these via bindActor()
+    @Inject
+    public SupervisorActor(
+        final JobService jobService,
+        final TaskService taskService,
+        final FileStorageService fsService
+    ) {
         super();
+        this.jobService = jobService;
+        this.taskService = taskService;
+        this.fsService = fsService;
     }
 
     @Override
@@ -102,7 +119,7 @@ public class SupervisorActor extends BaseActor {
     @Override
     protected void onInit(final Init obj) {
         // initialize child actors
-        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(10), "FileDispatcherActor");
+        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(jobService, taskService, fsService, 10), "FileDispatcherActor");
         // registerActor(FileProcessorActor.class, FileProcessorActor.props(self()), "FileProcessorActor");
 
         // create and start heartbeat scheduler
@@ -187,8 +204,8 @@ public class SupervisorActor extends BaseActor {
     }
 
     // API
-    public static Props props() {
-        return Props.create(SupervisorActor.class, () -> new SupervisorActor());
+    public static Props props(final JobService jobService, final TaskService taskService, final FileStorageService fsService) {
+        return Props.create(SupervisorActor.class, () -> new SupervisorActor(jobService, taskService, fsService));
     }
 
     // MESSAGES

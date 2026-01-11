@@ -15,6 +15,7 @@ import models.tasks.Task;
 import play.db.jpa.JPA;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
+import services.FileStorageService;
 import services.JobService;
 import services.TaskService;
 
@@ -27,16 +28,23 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FileDispatcherActor extends BaseActor {
 
-    private final JobService jobService = JobService.getInstance();
-    private final TaskService taskService = TaskService.getInstance();
+    private final JobService jobService;
+    private final TaskService taskService;
+    private final FileStorageService fsService;
 
     private final Queue<FileProcessorActor.Command> queue = new ConcurrentLinkedQueue<>();
     private final Set<FileProcessorActor.Command> actives = Collections.newSetFromMap(new ConcurrentHashMap<>());
     private final int parallelism;
     private ActorRef router;
 
-    public FileDispatcherActor(final int parallelism) {
+    public FileDispatcherActor(final JobService jobService,
+                               final TaskService taskService,
+                               final FileStorageService fsService,
+                               final int parallelism) {
         super();
+        this.jobService = jobService;
+        this.taskService = taskService;
+        this.fsService = fsService;
         this.parallelism = parallelism;
     }
 
@@ -55,13 +63,18 @@ public class FileDispatcherActor extends BaseActor {
     @Override
     protected void onInit(Init obj) {
         super.onInit(obj);
-        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(self())));
+        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(taskService, fsService, self())));
     }
 
     private void onEnqueue(final Enqueue cmd) {
         logger.info("Received enqueue command: {}", cmd);
         JPA.withTransaction(() -> {
             final Job job = jobService.get(cmd.jobId);
+            if (job == null) {
+                logger.error("Job {} not found", cmd.jobId);
+                return;
+            }
+
             job.setStatus(Job.Status.PROCESSING);
 
             final FileStorage fs = job.getFile();
@@ -104,8 +117,11 @@ public class FileDispatcherActor extends BaseActor {
     }
 
     // PROPS
-    public static Props props(final int parallelism) {
-        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(parallelism));
+    public static Props props(final JobService jobService,
+                              final TaskService taskService,
+                              final FileStorageService fsService,
+                              final int parallelism) {
+        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(jobService, taskService, fsService, parallelism));
     }
 
     @Data

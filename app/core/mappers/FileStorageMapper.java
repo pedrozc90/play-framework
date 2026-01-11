@@ -3,19 +3,12 @@ package core.mappers;
 import controllers.files.objects.FileStorageDto;
 import models.files.FileStorage;
 
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.UUID;
 
+@Singleton
 public class FileStorageMapper implements EntityMapper<FileStorage, FileStorageDto> {
-
-    private static FileStorageMapper instance;
-
-    public static FileStorageMapper getInstance() {
-        if (instance == null) {
-            instance = new FileStorageMapper();
-        }
-        return instance;
-    }
 
     @Override
     public FileStorageDto toDto(final FileStorage entity) {

@@ -24,14 +24,20 @@ import java.util.concurrent.RecursiveTask;
 public class FileProcessorActor extends BaseActor {
 
     private static final int MAX_RETRIES = 5;
-    private final TaskService service = TaskService.getInstance();
-    private final FileStorageService fsService = FileStorageService.getInstance();
+    private final TaskService jobService;
+    private final FileStorageService fsService;
     private final TaskExecutor executor = TaskExecutor.getInstance();
 
     private final ActorRef dispatcher;
 
-    private FileProcessorActor(final ActorRef dispatcher) {
+    private FileProcessorActor(
+        final TaskService jobService,
+        final FileStorageService fsService,
+        final ActorRef dispatcher
+    ) {
         super();
+        this.jobService = jobService;
+        this.fsService = fsService;
         this.dispatcher = dispatcher;
     }
 
@@ -57,7 +63,7 @@ public class FileProcessorActor extends BaseActor {
             final FileMetadata result = executor.execute(task);
 
             JPA.withTransaction(() -> {
-                service.update(cmd.taskId, TaskStatus.DONE);
+                jobService.update(cmd.taskId, TaskStatus.DONE);
 
                 final FileStorage fs = fsService.create(result.getFilename(), result.getBytes());
                 logger.info("New file storage created: {}", fs);
@@ -66,7 +72,7 @@ public class FileProcessorActor extends BaseActor {
             int retries = cmd.retries + 1;
             if (retries > MAX_RETRIES) {
                 logger.error("Failed to process command: {}", cmd);
-                JPA.withTransaction(() -> service.update(cmd.taskId, TaskStatus.FAILED));
+                JPA.withTransaction(() -> jobService.update(cmd.taskId, TaskStatus.FAILED));
             } else {
                 dispatcher.tell(cmd.withRetries(retries), self());
             }
@@ -74,8 +80,8 @@ public class FileProcessorActor extends BaseActor {
     }
 
     // API
-    public static Props props(final ActorRef dispatcher) {
-        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(dispatcher));
+    public static Props props(final TaskService service, final FileStorageService fsService, final ActorRef dispatcher) {
+        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(service, fsService, dispatcher));
     }
 
     // MESSAGES

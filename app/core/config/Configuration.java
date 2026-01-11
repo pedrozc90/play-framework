@@ -3,22 +3,12 @@ package core.config;
 import play.Application;
 import play.Play;
 
+import javax.inject.Singleton;
+
+@Singleton
 public class Configuration {
 
-    private static Configuration instance;
-
     private final Application application = Play.application();
-
-    public static Configuration getInstance() {
-        if (instance == null) {
-            synchronized (Configuration.class) {
-                if (instance == null) {
-                    instance = new Configuration();
-                }
-            }
-        }
-        return instance;
-    }
 
     public String mode() {
         return getAsString("application.mode");

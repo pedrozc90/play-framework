@@ -10,9 +10,11 @@ import scala.concurrent.ExecutionContext;
 import scala.concurrent.Future;
 import scala.runtime.AbstractFunction1;
 
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.List;
 
+@Singleton
 public class LogginFilter implements Filter {
 
     private static final Logger.ALogger logger = Logger.of(LogginFilter.class);

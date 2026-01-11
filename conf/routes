@@ -1,11 +1,11 @@
 # Routes
-GET         /                    controllers.Application.index()
+GET         /                    @controllers.Application.index()
 
-GET         /health              controllers.health.HealthController.health()
+GET         /health              @controllers.health.HealthController.health()
 
-POST        /api/files           controllers.files.FileController.upload()
+POST        /api/files           @controllers.files.FileController.upload()
 
-GET         /assets/*file        controllers.Assets.at(path = "/public", file)
+GET         /assets/*file        @controllers.Assets.at(path = "/public", file)
 
 # Externnals
 ->          /api/v1/ext          externals.Routes

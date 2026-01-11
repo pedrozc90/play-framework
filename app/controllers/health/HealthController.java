@@ -5,11 +5,16 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import services.HealthService;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class HealthController extends Controller {
 
-    private static final HealthService service = HealthService.getInstance();
+    @Inject
+    private HealthService service;
 
-    public static Result health() {
+    public Result health() {
         final HealthDto dto = service.create();
         return ResultBuilder.of(dto).ok();
     }

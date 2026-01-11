@@ -7,27 +7,40 @@ import core.utils.objects.ResultBuilder;
 import models.files.FileStorage;
 import models.jobs.Job;
 import play.Logger;
-import play.db.jpa.JPA;
+import play.db.jpa.JPAApi;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
 import services.FileStorageService;
 import services.JobService;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Objects;
 
+@Singleton
 public class FileController extends Controller {
 
     private static final Logger.ALogger logger = Logger.of(FileController.class);
 
-    private static final FileStorageService fsService = FileStorageService.getInstance();
-    private static final JobService jobService = JobService.getInstance();
-    private static final ActorsManager actorsManager = ActorsManager.getInstance();
+    @Inject
+    private FileStorageService fsService;
 
-    public static Result upload() throws AppException {
+    @Inject
+    private JobService jobService;
+
+    @Inject
+    private ActorsManager actorsManager;
+
+    @Inject
+    private JPAApi jpaApi;
+
+    @Transactional
+    public Result upload() throws AppException {
         final Http.MultipartFormData payload = request().body().asMultipartFormData();
         Objects.requireNonNull(payload, "Multipart form data must not be null");
 
@@ -36,18 +49,14 @@ public class FileController extends Controller {
         final FileMetadata metadata = parseMultipart(part);
 
         try {
-            final Job j = JPA.withTransaction(() -> {
-                final FileStorage fs = fsService.create(metadata.getFilename(), metadata.getBytes(), metadata.getContentType(), null);
-                logger.info("File {} (hash: {}) persisted.", fs.getFilename(), fs.getHash());
+            final FileStorage fs = fsService.create(metadata.getFilename(), metadata.getBytes(), metadata.getContentType(), null);
+            logger.info("File {} (hash: {}) persisted.", fs.getFilename(), fs.getHash());
 
-                final Job job = jobService.create(fs);
-                logger.info("New pending job (id: {}) for file {}.", job.getId(), fs.getFilename());
-
-                return job;
-            });
+            final Job job = jobService.create(fs);
+            logger.info("New pending job (id: {}) for file {}.", job.getId(), fs.getFilename());
 
             // notify worker **after** commit
-            actorsManager.queue(j);
+            actorsManager.queue(job);
 
             return ResultBuilder.of("File successfully uploaded.").ok();
         } catch (Throwable e) {
@@ -55,7 +64,7 @@ public class FileController extends Controller {
         }
     }
 
-    private static FileMetadata parseMultipart(final Http.MultipartFormData.FilePart part) throws AppException {
+    private FileMetadata parseMultipart(final Http.MultipartFormData.FilePart part) throws AppException {
         Objects.requireNonNull(part, "'file' must not be null");
 
         final File file = part.getFile();
