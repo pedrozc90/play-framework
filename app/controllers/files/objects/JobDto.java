@@ -1,0 +1,28 @@
+package controllers.files.objects;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import models.jobs.Job;
+
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import java.io.Serializable;
+
+@Data
+@EqualsAndHashCode(callSuper = true)
+@ToString(callSuper = true)
+public class JobDto extends AuditEntityDto implements Serializable {
+
+    @JsonProperty(value = "id")
+    private final Long id;
+
+    @Enumerated(EnumType.STRING)
+    @JsonProperty(value = "status")
+    private final Job.Status status;
+
+    @JsonProperty(value = "file")
+    private final FileStorageDto file;
+
+}
