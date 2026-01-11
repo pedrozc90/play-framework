@@ -1,51 +1,43 @@
 package core.play.filters;
 
+import akka.stream.Materializer;
 import play.Logger;
-import play.api.libs.concurrent.Execution;
-import play.api.mvc.*;
-import scala.Function1;
-import scala.Tuple2;
-import scala.collection.JavaConversions;
-import scala.concurrent.ExecutionContext;
-import scala.concurrent.Future;
-import scala.runtime.AbstractFunction1;
+import play.mvc.Filter;
+import play.mvc.Http;
+import play.mvc.Result;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Collections;
-import java.util.List;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
 @Singleton
-public class LogginFilter implements Filter {
+public class LogginFilter extends Filter {
 
     private static final Logger.ALogger logger = Logger.of(LogginFilter.class);
 
-    private final ExecutionContext executor = Execution.defaultContext();
-
-    @Override
-    public Future<Result> apply(final Function1<RequestHeader, Future<Result>> future, final RequestHeader header) {
-        final long start = System.currentTimeMillis();
-
-        logger.info("Incoming request: {} {}", header.method(), header.uri());
-
-        return future.apply(header).map(new AbstractFunction1<Result, Result>() {
-            @Override
-            public Result apply(final Result result) {
-                final long end = System.currentTimeMillis();
-                final long elapsed = end - start;
-                final int status = result.header().status();
-
-                logger.info("Complete request: {} {} -> {} ({} ms)", header.method(), header.uri(), status, elapsed);
-
-                final List<Tuple2<String, String>> headers = Collections.singletonList(new Tuple2<>("X-Response-Time", elapsed + "ms"));
-
-                return result.withHeaders(JavaConversions.asScalaBuffer(headers).toSeq());
-            }
-        }, executor);
+    @Inject
+    public LogginFilter(final Materializer mat) {
+        super(mat);
     }
 
     @Override
-    public EssentialAction apply(final EssentialAction next) {
-        return Filter$class.apply(this, next);
+    public CompletionStage<Result> apply(final Function<Http.RequestHeader, CompletionStage<Result>> next, final Http.RequestHeader request) {
+        final long start = System.currentTimeMillis();
+
+        final String method = request.method();
+        final String uri = request.uri();
+        logger.info("Incoming request: {} {}", method, uri);
+
+        return next.apply(request).thenApply(result -> {
+            final long end = System.currentTimeMillis();
+            final long elapsed = end - start;
+            final int status = result.status();
+
+            logger.info("Complete request: {} {} -> {} ({} ms)", method, uri, status, elapsed);
+
+            return result.withHeader("X-Response-Time", elapsed + "ms");
+        });
     }
 
 }

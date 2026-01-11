@@ -41,10 +41,10 @@ public class FileController extends Controller {
 
     @Transactional
     public Result upload() throws AppException {
-        final Http.MultipartFormData payload = request().body().asMultipartFormData();
+        final Http.MultipartFormData<File> payload = request().body().asMultipartFormData();
         Objects.requireNonNull(payload, "Multipart form data must not be null");
 
-        final Http.MultipartFormData.FilePart part = payload.getFile("file");
+        final Http.MultipartFormData.FilePart<File> part = payload.getFile("file");
 
         final FileMetadata metadata = parseMultipart(part);
 
@@ -64,7 +64,7 @@ public class FileController extends Controller {
         }
     }
 
-    private FileMetadata parseMultipart(final Http.MultipartFormData.FilePart part) throws AppException {
+    private FileMetadata parseMultipart(final Http.MultipartFormData.FilePart<File> part) throws AppException {
         Objects.requireNonNull(part, "'file' must not be null");
 
         final File file = part.getFile();

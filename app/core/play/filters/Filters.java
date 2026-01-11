@@ -1,13 +1,13 @@
 package core.play.filters;
 
-import play.api.mvc.EssentialFilter;
-import play.http.HttpFilters;
+import play.http.DefaultHttpFilters;
+import play.mvc.EssentialFilter;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
-public class Filters implements HttpFilters {
+public class Filters extends DefaultHttpFilters {
 
     private final CorsFilter corsFilter;
     private final LogginFilter logginFilter;
@@ -21,7 +21,7 @@ public class Filters implements HttpFilters {
 
     @Override
     public EssentialFilter[] filters() {
-        return new EssentialFilter[]{ corsFilter, logginFilter };
+        return new EssentialFilter[]{ corsFilter.asJava(), logginFilter.asJava() };
     }
 
 }
