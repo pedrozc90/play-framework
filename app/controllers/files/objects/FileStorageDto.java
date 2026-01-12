@@ -1,35 +1,56 @@
 package controllers.files.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.io.Serializable;
+import java.time.Instant;
+import java.util.UUID;
 
-@Data
-@NoArgsConstructor
+@Getter
 @EqualsAndHashCode(callSuper = true)
-@SuperBuilder(toBuilder = true)
+@ToString(callSuper = true)
 public class FileStorageDto extends AuditEntityDto implements Serializable {
 
     @JsonProperty(value = "id")
-    private Long id;
+    private final Long id;
 
     @JsonProperty(value = "hash")
-    private String hash;
+    private final String hash;
 
     @JsonProperty(value = "filename")
-    private String filename;
+    private final String filename;
 
     @JsonProperty(value = "content_type")
-    private String contentType;
+    private final String contentType;
 
     @JsonProperty(value = "charset")
-    private String charset;
+    private final String charset;
 
     @JsonProperty(value = "length")
-    private long length;
+    private final long length;
+
+    public FileStorageDto(
+        final UUID uuid,
+        final Instant insertedAt,
+        final Instant updatedAt,
+        final Integer version,
+        final Long id,
+        final String hash,
+        final String filename,
+        final String contentType,
+        final String charset,
+        final long length
+    ) {
+        super(uuid, insertedAt, updatedAt, version);
+        this.id = id;
+        this.hash = hash;
+        this.filename = filename;
+        this.contentType = contentType;
+        this.charset = charset;
+        this.length = length;
+    }
 
 }

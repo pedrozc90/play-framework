@@ -2,16 +2,17 @@ package controllers.files.objects;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.ToString;
 import models.tasks.TaskStatus;
 import models.tasks.TaskType;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.UUID;
 
-@Data
+@Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
 public class TaskDto extends AuditEntityDto implements Serializable {
@@ -35,5 +36,26 @@ public class TaskDto extends AuditEntityDto implements Serializable {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "completed_at")
     private final Instant completedAt;
+
+    public TaskDto(
+        final UUID uuid,
+        final Instant insertedAt,
+        final Instant updatedAt,
+        final Integer version,
+        final Long id,
+        final TaskType type,
+        final TaskStatus status,
+        final String errorMessage,
+        final Instant startedAt,
+        final Instant completedAt
+    ) {
+        super(uuid, insertedAt, updatedAt, version);
+        this.id = id;
+        this.type = type;
+        this.status = status;
+        this.errorMessage = errorMessage;
+        this.startedAt = startedAt;
+        this.completedAt = completedAt;
+    }
 
 }

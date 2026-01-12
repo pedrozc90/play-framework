@@ -69,8 +69,8 @@ public class FileDispatcherActor extends BaseActor {
     private void onEnqueue(final Enqueue cmd) {
         logger.info("Received enqueue command: {}", cmd);
 
-        jpa.withTransaction(() -> {
-            final Job job = jobService.get(cmd.jobId);
+        jpa.withTransaction((em) -> {
+            final Job job = jobService.get(em, cmd.jobId);
             if (job == null) {
                 logger.error("Job {} not found", cmd.jobId);
                 return;
@@ -80,7 +80,7 @@ public class FileDispatcherActor extends BaseActor {
 
             final FileStorage fs = job.getFile();
 
-            final List<Task> tasks = taskService.generateAll(job);
+            final List<Task> tasks = taskService.generateAll(em, job);
 
             for (Task task : tasks) {
                 final FileProcessorActor.Command command = new FileProcessorActor.Command(task.getId(), task.getType(), fs.getContent(), fs.getFilename(), fs.getExtension());

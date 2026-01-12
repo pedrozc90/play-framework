@@ -1,14 +1,11 @@
-package controllers.files.objects;
+package controllers.users.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Data;
+import controllers.files.objects.AuditEntityDto;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
-import models.jobs.Job;
 
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -16,31 +13,30 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode(callSuper = true)
 @ToString(callSuper = true)
-public class JobDto extends AuditEntityDto implements Serializable {
+public class UserDto extends AuditEntityDto implements Serializable {
 
     @JsonProperty(value = "id")
     private final Long id;
 
-    @Enumerated(EnumType.STRING)
-    @JsonProperty(value = "status")
-    private final Job.Status status;
+    @JsonProperty(value = "email")
+    private final String email;
 
-    @JsonProperty(value = "file")
-    private final FileStorageDto file;
+    @JsonProperty(value = "active")
+    private final Boolean active;
 
-    public JobDto(
+    public UserDto(
         final UUID uuid,
         final Instant insertedAt,
         final Instant updatedAt,
         final Integer version,
         final Long id,
-        final Job.Status status,
-        final FileStorageDto file
+        final String email,
+        final Boolean active
     ) {
         super(uuid, insertedAt, updatedAt, version);
         this.id = id;
-        this.status = status;
-        this.file = file;
+        this.email = email;
+        this.active = active;
     }
 
 }

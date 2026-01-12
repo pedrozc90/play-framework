@@ -1,9 +1,9 @@
 package core.play.handlers;
 
-import play.Configuration;
+import com.typesafe.config.Config;
+import core.exceptions.AppException;
 import play.Environment;
 import play.api.OptionalSourceMapper;
-import play.api.UsefulException;
 import play.api.routing.Router;
 import play.http.DefaultHttpErrorHandler;
 import play.mvc.Http;
@@ -12,17 +12,19 @@ import play.mvc.Result;
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class ErrorHandler extends DefaultHttpErrorHandler {
 
     @Inject
-    public ErrorHandler(final Configuration configuration,
+    public ErrorHandler(final Config config,
                         final Environment environment,
                         final OptionalSourceMapper sourceMapper,
                         final Provider<Router> routes) {
-        super(configuration, environment, sourceMapper, routes);
+        super(config, environment, sourceMapper, routes);
     }
 
     @Override
@@ -41,11 +43,6 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     @Override
-    public CompletionStage<Result> onServerError(final Http.RequestHeader request, final Throwable cause) {
-        return super.onServerError(request, cause);
-    }
-
-    @Override
     public CompletionStage<Result> onClientError(final Http.RequestHeader request, final int statusCode, final String message) {
         return super.onClientError(request, statusCode, message);
     }
@@ -56,18 +53,22 @@ public class ErrorHandler extends DefaultHttpErrorHandler {
     }
 
     @Override
-    protected void logServerError(final Http.RequestHeader request, final UsefulException exception) {
-        super.logServerError(request, exception);
+    public CompletionStage<Result> onServerError(final Http.RequestHeader request, final Throwable exception) {
+        final Throwable cause = unwrap(exception);
+
+        if (cause instanceof AppException) {
+            AppException e = (AppException) cause;
+            return CompletableFuture.completedFuture(e.toResult());
+        }
+
+        return super.onServerError(request, exception);
     }
 
-    @Override
-    protected CompletionStage<Result> onDevServerError(final Http.RequestHeader request, final UsefulException exception) {
-        return super.onDevServerError(request, exception);
-    }
-
-    @Override
-    protected CompletionStage<Result> onProdServerError(final Http.RequestHeader request, final UsefulException exception) {
-        return super.onProdServerError(request, exception);
+    private Throwable unwrap(final Throwable throwable) {
+        if (throwable instanceof CompletionException && throwable.getCause() != null) {
+            return throwable.getCause();
+        }
+        return throwable;
     }
 
 }

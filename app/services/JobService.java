@@ -7,6 +7,7 @@ import repositories.JobRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManager;
 
 @Singleton
 public class JobService {
@@ -22,24 +23,24 @@ public class JobService {
     }
 
     // QUERY
-    public Job get(final Long id) {
-        return repository.findById(id);
+    public Job get(final EntityManager em, final Long id) {
+        return repository.findById(em, id);
     }
 
-    public Job getByFile(final FileStorage file) {
-        return repository.get(file);
+    public Job getByFile(final EntityManager em, final FileStorage file) {
+        return repository.get(em, file);
     }
 
     // METHODS
-    public Job create(final FileStorage file) {
+    public Job create(final EntityManager em, final FileStorage file) {
         final Job obj = new Job();
         obj.setStatus(Job.Status.PENDING);
         obj.setFile(file);
 
-        final Job persisted = repository.persist(obj);
+        final Job persisted = repository.persist(em, obj);
 
         // add job to processing queue
-        actors.queue(persisted);
+        // actors.queue(persisted);
 
         return persisted;
     }

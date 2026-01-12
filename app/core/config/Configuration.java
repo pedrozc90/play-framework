@@ -1,14 +1,22 @@
 package core.config;
 
-import play.Application;
-import play.Play;
+import com.typesafe.config.Config;
+import play.Logger;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
 public class Configuration {
 
-    private final Application application = Play.application();
+    private final Logger.ALogger logger = Logger.of(Configuration.class);
+
+    private final Config config;
+
+    @Inject
+    public Configuration(final Config config) {
+        this.config = config;
+    }
 
     public String mode() {
         return getAsString("application.mode");
@@ -24,15 +32,18 @@ public class Configuration {
 
     // HELPERS
     private String getAsString(final String key) {
-        return application.configuration().getString(key);
+        if (!config.hasPath(key)) return null;
+        return config.getString(key);
     }
 
     private Integer getAsInteger(final String key) {
-        return application.configuration().getInt(key);
+        if (!config.hasPath(key)) return null;
+        return config.getInt(key);
     }
 
     private boolean getAsBoolean(final String key) {
-        return application.configuration().getBoolean(key) == Boolean.TRUE;
+        if (!config.hasPath(key)) return false;
+        return config.getBoolean(key);
     }
 
 }

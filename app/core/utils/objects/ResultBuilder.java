@@ -2,10 +2,10 @@ package core.utils.objects;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.Data;
 import play.libs.Json;
 import play.mvc.Result;
 import play.mvc.Results;
-
 
 public class ResultBuilder {
 
@@ -129,17 +129,14 @@ public class ResultBuilder {
 
     }
 
+    @Data
     private static class ResultMessage {
 
         @JsonProperty(value = "message")
-        private String message;
+        private final String message;
 
         public ResultMessage(final String message) {
             this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
         }
 
     }

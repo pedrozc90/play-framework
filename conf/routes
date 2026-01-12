@@ -3,9 +3,9 @@ GET         /                    @controllers.Application.index()
 
 GET         /health              @controllers.health.HealthController.health()
 
-POST        /api/files           @controllers.files.FileController.upload()
+POST        /api/files           @controllers.files.FileController.upload(req: Request)
 
 GET         /assets/*file        @controllers.Assets.at(path = "/public", file)
 
-# Externnals
+->          /api/users           users.Routes
 ->          /api/v1/ext          externals.Routes

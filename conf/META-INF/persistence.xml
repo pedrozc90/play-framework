@@ -10,6 +10,7 @@
         <class>models.files.FileStorage</class>
         <class>models.jobs.Job</class>
         <class>models.tasks.Task</class>
+        <class>models.users.User</class>
 
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.PostgreSQL10Dialect"/>

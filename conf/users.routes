@@ -1,0 +1,2 @@
+# Routes
+POST        /        @controllers.users.UserController.register(req: Request)

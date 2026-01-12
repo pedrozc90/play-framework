@@ -46,19 +46,19 @@ lazy val root = (project in file("."))
             "javax.persistence" % "javax.persistence-api" % "2.2",
 
             // QueryDSL
-            "com.mysema.querydsl" % "querydsl-core" % "3.6.3",
-            "com.mysema.querydsl" % "querydsl-jpa" % "3.6.3",
-            "com.mysema.querydsl" % "querydsl-apt" % "3.6.3" % "provided",
+            "com.querydsl" % "querydsl-core" % "4.3.0",
+            "com.querydsl" % "querydsl-jpa" % "4.3.0",
+            "com.querydsl" % "querydsl-apt" % "4.3.0" % "provided",
 
             // Lombok
             "org.projectlombok" % "lombok" % "1.18.42" % "provided",
 
             // Play
-            "com.typesafe.play" %% "play-test" % "2.6.25" % Test,
+            "com.typesafe.play" %% "play-test" % "2.7.9" % Test,
 
             // Testing
             "org.mockito" % "mockito-core" % "2.28.2" % Test,
-            "org.awaitility" % "awaitility" % "2.0.0" % Test,
-            "org.assertj" % "assertj-core" % "3.6.2" % Test
+            "org.awaitility" % "awaitility" % "3.0.0" % Test,
+            "org.assertj" % "assertj-core" % "3.8.0" % Test
         )
     )

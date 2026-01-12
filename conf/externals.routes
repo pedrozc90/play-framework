@@ -2,4 +2,4 @@
 GET           /        @externals.v1.controllers.ExternalController.get()
 POST          /        @externals.v1.controllers.ExternalController.post()
 PUT           /        @externals.v1.controllers.ExternalController.put()
-DELETE        /        @externals.v1.controllers.ExternalController.delete()
+DELETE        /        @externals.v1.controllers.ExternalController.delete(req: Request)

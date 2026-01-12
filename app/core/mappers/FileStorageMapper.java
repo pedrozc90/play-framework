@@ -5,6 +5,7 @@ import models.files.FileStorage;
 
 import javax.inject.Singleton;
 import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.UUID;
 
 @Singleton
@@ -13,18 +14,21 @@ public class FileStorageMapper implements EntityMapper<FileStorage, FileStorageD
     @Override
     public FileStorageDto toDto(final FileStorage entity) {
         if (entity == null) return null;
-        final FileStorageDto dto = new FileStorageDto();
-        dto.setId(entity.getId());
-        dto.setUuid(UUID.fromString(entity.getUuid()));
-        dto.setInsertedAt(entity.getInsertedAt().toInstant());
-        dto.setUpdatedAt(entity.getUpdatedAt().toInstant());
-        dto.setVersion(entity.getVersion());
-        dto.setHash(entity.getHash());
-        dto.setFilename(entity.getFilename());
-        dto.setContentType(entity.getContentType());
-        dto.setCharset(entity.getCharset());
-        dto.setLength(entity.getLength());
-        return dto;
+        final UUID uuid = UUID.fromString(entity.getUuid());
+        final Instant insertedAt = entity.getInsertedAt().toInstant();
+        final Instant updatedAt = entity.getUpdatedAt().toInstant();
+        return new FileStorageDto(
+            uuid,
+            insertedAt,
+            updatedAt,
+            entity.getVersion(),
+            entity.getId(),
+            entity.getHash(),
+            entity.getFilename(),
+            entity.getContentType(),
+            entity.getCharset(),
+            entity.getLength()
+        );
     }
 
     @Override

@@ -7,6 +7,7 @@ import repositories.FileStorageRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManager;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.UUID;
@@ -18,12 +19,12 @@ public class FileStorageService {
     private FileStorageRepository repository;
 
     // QUERY
-    public FileStorage get(final UUID uuid) {
-        return repository.get(uuid);
+    public FileStorage get(final EntityManager em, final UUID uuid) {
+        return repository.get(em, uuid);
     }
 
     // METHODS
-    public FileStorage create(final String filename, final byte[] bytes, final String contentType, final String charset) {
+    public FileStorage create(final EntityManager em, final String filename, final byte[] bytes, final String contentType, final String charset) {
         final String hash = HashUtils.sha256(bytes);
 
         final String extension = FileUtils.getExtension(filename);
@@ -37,13 +38,13 @@ public class FileStorageService {
         obj.setCharset(charset);
         obj.setLength(bytes.length);
 
-        return repository.persist(obj);
+        return repository.persist(em, obj);
     }
 
-    public FileStorage create(final String filename, final byte[] bytes) {
+    public FileStorage create(final EntityManager em, final String filename, final byte[] bytes) {
         final String contentType = FileUtils.getContentType(filename);
         final Charset charset = FileUtils.isText(contentType) ? StandardCharsets.UTF_8 : null;
-        return create(filename, bytes, contentType, charset != null ? charset.name() : null);
+        return create(em, filename, bytes, contentType, charset != null ? charset.name() : null);
     }
 
 }

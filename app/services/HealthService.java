@@ -9,8 +9,12 @@ import javax.inject.Singleton;
 @Singleton
 public class HealthService {
 
+    private final Configuration config;
+
     @Inject
-    private Configuration config;
+    public HealthService(final Configuration config) {
+        this.config = config;
+    }
 
     public HealthDto create() {
         return new HealthDto(

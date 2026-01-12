@@ -63,17 +63,19 @@ public class FileProcessorActor extends BaseActor {
 
             final FileMetadata result = executor.execute(task);
 
-            jpa.withTransaction(() -> {
-                jobService.update(cmd.taskId, TaskStatus.DONE);
+            jpa.withTransaction((em) -> {
+                jobService.update(em, cmd.taskId, TaskStatus.DONE);
 
-                final FileStorage fs = fsService.create(result.getFilename(), result.getBytes());
+                final FileStorage fs = fsService.create(em, result.getFilename(), result.getBytes());
                 logger.info("New file storage created: {}", fs);
             });
         } catch (Exception e) {
             int retries = cmd.retries + 1;
             if (retries > MAX_RETRIES) {
                 logger.error("Failed to process command: {}", cmd);
-                jpa.withTransaction(() -> jobService.update(cmd.taskId, TaskStatus.FAILED));
+                jpa.withTransaction((em) -> {
+                    jobService.update(em, cmd.taskId, TaskStatus.FAILED);
+                });
             } else {
                 dispatcher.tell(cmd.withRetries(retries), self());
             }
