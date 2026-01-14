@@ -7,6 +7,7 @@ import repositories.UserRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 
 @Singleton
 public class UserService {
@@ -31,6 +32,11 @@ public class UserService {
             user.setPassword(hashed);
             return repository.persist(em, user);
         });
+    }
+
+    public CompletableFuture<User> get(final String email, final String password) {
+        final String hashed = HashUtils.md5(password);
+        return repository.get(email, hashed);
     }
 
 }

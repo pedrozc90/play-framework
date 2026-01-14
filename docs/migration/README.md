@@ -1,0 +1,10 @@
+- [Migrating Guide 2.5 -> 2.6](https://www.playframework.com/documentation/3.0.x/Migration26)
+    - `2.6.25`
+- [Migrating Guide 2.6 -> 2.7](https://www.playframework.com/documentation/3.0.x/Migration27)
+    - `2.7.9`
+- [Migrating Guide 2.7 -> 2.8](https://www.playframework.com/documentation/3.0.x/Migration28)
+    - `2.8.22`
+- [Migrating Guide 2.8 -> 2.9](https://www.playframework.com/documentation/3.0.x/Migration29)
+    - `2.9.10`
+- [Migrating Guide 2.9 -> 3.0](https://www.playframework.com/documentation/3.0.x/Migration30)
+    - `3.0.10` 

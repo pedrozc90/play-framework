@@ -31,6 +31,9 @@ lazy val root = (project in file("."))
             "com.fasterxml.jackson.datatype" % "jackson-datatype-joda" % "2.14.0",
             "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.14.0",
 
+            // JWT
+            "com.auth0" % "java-jwt" % "4.4.0",
+
             // Akka
             // "com.typesafe.akka" %% "akka-testkit" % "2.10.9" % Test,
 

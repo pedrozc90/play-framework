@@ -7,6 +7,8 @@ import services.HealthService;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class HealthController extends Controller {
@@ -14,9 +16,11 @@ public class HealthController extends Controller {
     @Inject
     private HealthService service;
 
-    public Result health() {
-        final HealthDto dto = service.create();
-        return ResultBuilder.of(dto).ok();
+    public CompletionStage<Result> health() {
+        return CompletableFuture.supplyAsync(() -> {
+            final HealthDto dto = service.create();
+            return ResultBuilder.of(dto).ok();
+        });
     }
 
 }

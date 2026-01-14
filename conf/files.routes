@@ -1,0 +1,2 @@
+# Routes
+POST        /        @controllers.files.FileController.upload(req: Request)

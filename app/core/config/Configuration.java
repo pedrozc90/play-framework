@@ -18,6 +18,7 @@ public class Configuration {
         this.config = config;
     }
 
+    // APPLICATION
     public String mode() {
         return getAsString("application.mode");
     }
@@ -30,6 +31,20 @@ public class Configuration {
         return getAsString("application.version");
     }
 
+    // JWT
+    public String getJwtSecret() {
+        return getAsString("application.jwt.secret");
+    }
+
+    public String getJwtIssuer() {
+        return getAsString("application.jwt.issuer");
+    }
+
+    public long getJwtExpiration() {
+        final Long value = getAsLong("application.jwt.expiration");
+        return (value != null) ? value : 60L;
+    }
+
     // HELPERS
     private String getAsString(final String key) {
         if (!config.hasPath(key)) return null;
@@ -40,6 +55,12 @@ public class Configuration {
         if (!config.hasPath(key)) return null;
         return config.getInt(key);
     }
+
+    private Long getAsLong(final String key) {
+        if (!config.hasPath(key)) return null;
+        return config.getLong(key);
+    }
+
 
     private boolean getAsBoolean(final String key) {
         if (!config.hasPath(key)) return false;

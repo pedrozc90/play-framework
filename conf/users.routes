@@ -1,2 +1,3 @@
 # Routes
-POST        /        @controllers.users.UserController.register(req: Request)
+POST        /           @controllers.users.UserController.register(req: Request)
+GET         /:id        @controllers.users.UserController.get(req: Request, id: Long)

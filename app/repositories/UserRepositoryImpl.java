@@ -7,6 +7,7 @@ import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.NoResultException;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
@@ -19,16 +20,24 @@ public class UserRepositoryImpl extends JPARepositoryImpl<User, Long> implements
 
     @Override
     public User get(final EntityManager em, final String email) {
-        return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
-            .setParameter("email", email)
-            .getSingleResult();
+        try {
+            return em.createQuery("SELECT u FROM User u WHERE u.email = :email", User.class)
+                .setParameter("email", email)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public User get(final EntityManager em, final String email, final String password) {
-        return em.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
-            .setParameter("email", email)
-            .setParameter("password", password)
-            .getSingleResult();
+        try {
+            return em.createQuery("SELECT u FROM User u WHERE u.email = :email AND u.password = :password", User.class)
+                .setParameter("email", email)
+                .setParameter("password", password)
+                .getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
     }
 
     public Stream<User> fetch(final EntityManager em) {

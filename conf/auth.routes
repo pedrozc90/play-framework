@@ -1,0 +1,3 @@
+# Routes
+POST        /login          @controllers.auth.AuthController.login(req: Request)
+GET         /context        @controllers.auth.AuthController.context(req: Request)

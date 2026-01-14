@@ -36,6 +36,11 @@ public class AppException extends Exception {
         return new AppException(400, message);
     }
 
+    public static AppException of(final int status, final String fmt, final Object... args) {
+        final String message = String.format(fmt, args);
+        return new AppException(status, message);
+    }
+
     public static AppException of(final String fmt, final Object... args) {
         final String message = String.format(fmt, args);
         return new AppException(message);

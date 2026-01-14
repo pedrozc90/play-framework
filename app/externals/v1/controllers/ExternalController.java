@@ -1,5 +1,8 @@
 package externals.v1.controllers;
 
+import core.auth.Authenticated;
+import core.auth.RequiresRole;
+import core.utils.objects.ResultBuilder;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -9,21 +12,25 @@ import javax.inject.Singleton;
 @Singleton
 public class ExternalController extends Controller {
 
+    @Authenticated
     public Result get() {
-        return ok();
+        return ResultBuilder.of("Sanity Check").ok();
     }
 
+    @Authenticated
     public Result post() {
-        return ok();
+        return ResultBuilder.of("Sanity Check").ok();
     }
 
+    @Authenticated
     public Result put() {
-        return ok();
+        return ResultBuilder.of("Sanity Check").ok();
     }
 
+    @Authenticated
+    @RequiresRole(value = { "externals" })
     public Result delete(final Http.Request request) {
-        // throw new UnsupportedOperationException("Method Not Implemented Yet.");
-        return TODO(request);
+        return ResultBuilder.of("Sanity Check").status(501);
     }
 
 }

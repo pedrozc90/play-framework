@@ -7,5 +7,7 @@ POST        /api/files           @controllers.files.FileController.upload(req: R
 
 GET         /assets/*file        @controllers.Assets.at(path = "/public", file)
 
+->          /api/auth            auth.Routes
 ->          /api/users           users.Routes
+->          /api/file            files.Routes
 ->          /api/v1/ext          externals.Routes
