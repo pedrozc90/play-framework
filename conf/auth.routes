@@ -1,0 +1,7 @@
+# conf/auth.routes
+# Prefix: /api/auth
+
+POST        /login                     controllers.auth.AuthController.login()
+POST        /logout                    controllers.auth.AuthController.logout()
+GET         /context                   controllers.auth.AuthController.context()
+GET         /context/permission        controllers.auth.AuthController.permissions()

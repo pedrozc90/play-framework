@@ -1,0 +1,8 @@
+# conf/users.routes
+# Prefix: /api/users
+
+GET           /           controllers.users.UserController.fetch(page: Int ?= 1, rows: Int ?= 15, q: String)
+POST          /           controllers.users.UserController.save()
+GET           /:id        controllers.users.UserController.get(id: Long)
+PUT           /:id        controllers.users.UserController.update(id: Long)
+DELETE        /:id        controllers.users.UserController.delete(id: Long)
