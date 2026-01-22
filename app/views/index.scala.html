@@ -1,0 +1,32 @@
+@(title: String, message: String)
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>@title</title>
+        <link rel="stylesheet" href="@controllers.routes.Assets.at("stylesheets/styles.css")">
+    </head>
+    <body>
+        <main class="container">
+            <h1>@message</h1>
+            <p>Welcome to the REST API index page.</p>
+            <p>Use the following endpoints to interact with the API:</p>
+            <ul>
+                <li><span><code>POST /api/login</code> — Login</span></li>
+                <li><span><code>GET  /api/logout</code> — Logout</span></li>
+                <li><span><code>GET  /api/context</code> — Get user context</span></li>
+                <li><span><code>GET  /api/health</code> — Application health</span></li>
+                <li><span><code>GET  /api/files</code> — List files</span></li>
+                <li><span><code>POST /api/files</code> — Upload file</span></li>
+                <li><span><code>GET  /api/users</code> — List users</span></li>
+                <li><span><code>POST /api/users</code> — Register user</span></li>
+                <li><span><code>GET  /api/users/:id</code> — Get user</span></li>
+                <li><span><code>PUT  /api/users/:id</code> — Update user</span></li>
+                <li><span><code>DELETE /api/users/:id</code> — Delete user</span></li>
+            </ul>
+            <p>For full documentation, contact the development team or check the README.</p>
+        </main>
+    </body>
+</html>
