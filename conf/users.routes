@@ -1,0 +1,8 @@
+# conf/users.routes
+# Prefix: /api/users
+
+GET        /        web.controllers.users.UserController.fetch(page: Int ?= 1, rows: Int ?= 15, q: String ?= null, active: java.lang.Boolean ?= null)
+POST          /           web.controllers.users.UserController.save()
+GET           /:id        web.controllers.users.UserController.get(id: Long)
+PUT           /:id        web.controllers.users.UserController.update(id: Long)
+DELETE        /:id        web.controllers.users.UserController.delete(id: Long)

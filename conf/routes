@@ -1,0 +1,10 @@
+# Routes
+GET        /                    web.controllers.Application.index()
+
+GET        /health              web.controllers.health.HealthController.health()
+
+->         /api                 auth.Routes
+->         /api/users           users.Routes
+->         /api/files           files.Routes
+
+GET        /assets/*file        controllers.Assets.at(path = "/public", file)
