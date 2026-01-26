@@ -8,24 +8,15 @@ import domain.users.User;
 import infrastructure.repositories.UserRepository;
 import web.controllers.users.objects.UserUpdateCmd;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Objects;
 
+@Singleton
 public class UserService {
 
-    private final UserRepository repository = UserRepository.getInstance();
-
-    private static UserService instance;
-
-    public static UserService getInstance() {
-        if (instance == null) {
-            synchronized (UserService.class) {
-                if (instance == null) {
-                    instance = new UserService();
-                }
-            }
-        }
-        return instance;
-    }
+    @Inject
+    private UserRepository repository;
 
     // QUERY
     public User get(final Long id) throws AppException {

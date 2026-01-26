@@ -1,5 +1,3 @@
-import play.PlayJava
-
 lazy val scala2 = "2.11.1"
 
 lazy val root = (project in file("."))
@@ -22,17 +20,22 @@ lazy val root = (project in file("."))
             javaCore,
             javaJdbc,
             javaJpa,
+            evolutions,
 
             // Database
-            "org.postgresql" % "postgresql" % "42.2.29",
+            "org.postgresql" % "postgresql" % "42.6.0",
 
             // Hibernate
-            "org.hibernate" % "hibernate-core" % "4.2.21.Final",
-            "org.hibernate" % "hibernate-entitymanager" % "4.2.21.Final",
+            "org.hibernate" % "hibernate-core" % "5.0.12.Final",
+            "org.hibernate" % "hibernate-entitymanager" % "5.0.12.Final",
             "org.hibernate" % "hibernate-validator" % "5.0.3.Final",
 
             // Java Standard API
-            "org.hibernate.javax.persistence" % "hibernate-jpa-2.0-api" % "1.0.1.Final",
+            "org.hibernate.javax.persistence" % "hibernate-jpa-2.1-api" % "1.0.0.Final",
+
+            // Jackson
+            "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.5.4",
+            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.5.4",
 
             // Validation
             "javax.el" % "el-api" % "2.2",
@@ -45,10 +48,10 @@ lazy val root = (project in file("."))
             "p6spy" % "p6spy" % "3.8.7",
 
             // Lombok
-            "org.projectlombok" % "lombok" % "1.16.20" % "provided",
+            "org.projectlombok" % "lombok" % "1.18.32" % "provided",
 
             // Testing
-            "junit" % "junit" % "4.12" % Test,
-            "com.typesafe.play" %% "play-test" % "2.3.9" % Test
+            "junit" % "junit" % "4.13.2" % Test,
+            "com.typesafe.play" %% "play-test" % "2.4.11" % Test
         )
     )

@@ -8,23 +8,18 @@ import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
 import infrastructure.repositories.TaskRepository;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+@Singleton
 public class TaskService {
 
-    private final TaskRepository repository = TaskRepository.getInstance();
-
-    private static TaskService instance;
-
-    public static TaskService getInstance() {
-        if (instance == null) {
-            instance = new TaskService();
-        }
-        return instance;
-    }
+    @Inject
+    private TaskRepository repository;
 
     // QUERY
     public Task get(final Long id) {

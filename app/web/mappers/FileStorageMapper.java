@@ -5,19 +5,12 @@ import core.utils.DateUtils;
 import domain.files.FileStorage;
 import web.dtos.FileStorageDto;
 
+import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.UUID;
 
+@Singleton
 public class FileStorageMapper implements EntityMapper<FileStorage, FileStorageDto> {
-
-    private static FileStorageMapper instance;
-
-    public static FileStorageMapper getInstance() {
-        if (instance == null) {
-            instance = new FileStorageMapper();
-        }
-        return instance;
-    }
 
     @Override
     public FileStorageDto toDto(final FileStorage entity) {

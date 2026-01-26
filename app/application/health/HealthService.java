@@ -3,18 +3,14 @@ package application.health;
 import config.Configuration;
 import web.controllers.health.objects.HealthDto;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class HealthService {
 
-    private final Configuration config = Configuration.getInstance();
-
-    private static HealthService instance;
-
-    public static HealthService getInstance() {
-        if (instance == null) {
-            instance = new HealthService();
-        }
-        return instance;
-    }
+    @Inject
+    private Configuration config;
 
     public HealthDto create() {
         return new HealthDto(

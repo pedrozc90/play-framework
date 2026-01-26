@@ -18,25 +18,41 @@ import play.mvc.Result;
 import web.dtos.FileStorageDto;
 import web.mappers.FileStorageMapper;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Objects;
 
+@Singleton
 public class FileController extends Controller {
 
     private static final Logger.ALogger logger = Logger.of(FileController.class);
 
-    private static final FileStorageService fsService = FileStorageService.getInstance();
-    private static final JobService jobService = JobService.getInstance();
-    private static final ActorsManager actorsManager = ActorsManager.getInstance();
-    private static final FileStorageMapper mapper = FileStorageMapper.getInstance();
+    private final FileStorageService fsService;
+    private final JobService jobService;
+    private final ActorsManager actorsManager;
+    private final FileStorageMapper mapper;
 
-    public static Result fetch(final int page, final int rows, final String q) throws AppException {
+    @Inject
+    public FileController(
+        final FileStorageService fsService,
+        final JobService jobService,
+        final ActorsManager actorsManager,
+        final FileStorageMapper mapper
+    ) {
+        this.fsService = fsService;
+        this.jobService = jobService;
+        this.actorsManager = actorsManager;
+        this.mapper = mapper;
+    }
+
     @Transactional(readOnly = true)
+    public Result fetch(final int page, final int rows, final String q) throws AppException {
         final Page<FileStorage> result = fsService.fetch(page, rows, q);
         final Page<FileStorageDto> resultDto = result.map(mapper::toDto);
         return ResultBuilder.of(resultDto).ok();
     }
 
-    public static Result upload() throws AppException {
+    public Result upload() throws AppException {
         final Http.MultipartFormData payload = request().body().asMultipartFormData();
         Objects.requireNonNull(payload, "Multipart form data must not be null");
 

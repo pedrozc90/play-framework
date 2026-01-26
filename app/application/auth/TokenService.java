@@ -11,6 +11,8 @@ import config.Configuration;
 import core.exceptions.AppException;
 import core.utils.http.HttpStatus;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -22,9 +24,8 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+@Singleton
 public class TokenService {
-
-    public static final Configuration config = Configuration.getInstance();
 
     private final long expiration;
     private final String issuer;
@@ -34,7 +35,8 @@ public class TokenService {
     private final JWTSigner.Options opts;
     private final JWTVerifier verifier;
 
-    public TokenService() {
+    @Inject
+    public TokenService(final Configuration config) {
         issuer = config.getJwtIssuer();
         secret = config.getJwtSecret();
 
@@ -54,19 +56,6 @@ public class TokenService {
         signer = new JWTSigner(secret);
 
         verifier = new JWTVerifier(secret, null, issuer);
-    }
-
-    public static TokenService instance;
-
-    public static TokenService getInstance() {
-        if (instance == null) {
-            synchronized (TokenService.class) {
-                if (instance == null) {
-                    instance = new TokenService();
-                }
-            }
-        }
-        return instance;
     }
 
     /**

@@ -3,26 +3,22 @@ package infrastructure.repositories;
 
 import core.objects.Page;
 import domain.users.User;
+import play.db.jpa.JPAApi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.NoResultException;
 import javax.persistence.TypedQuery;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Singleton
 public class UserRepository extends JpaRepository<User, Long> {
 
-    private static UserRepository instance;
-
-    public static UserRepository getInstance() {
-        if (instance == null) {
-            instance = new UserRepository();
-        }
-        return instance;
-    }
-
-    public UserRepository() {
-        super(User.class);
+    @Inject
+    public UserRepository(final JPAApi jpa) {
+        super(jpa, User.class);
     }
 
     public User get(final String email) {

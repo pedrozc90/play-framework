@@ -4,19 +4,12 @@ import core.utils.DateUtils;
 import domain.tasks.Task;
 import web.dtos.TaskDto;
 
+import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.UUID;
 
+@Singleton
 public class TaskMapper implements EntityMapper<Task, TaskDto> {
-
-    private static TaskMapper instance;
-
-    public static TaskMapper getInstance() {
-        if (instance == null) {
-            instance = new TaskMapper();
-        }
-        return instance;
-    }
 
     @Override
     public TaskDto toDto(final Task entity) {

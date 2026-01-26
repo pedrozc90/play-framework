@@ -1,10 +1,9 @@
 package web.controllers.health.objects;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import core.utils.jackson.TimestampDeserializer;
-import core.utils.jackson.TimestampSerializer;
 import core.utils.jackson.ZoneIdDeserializer;
 import core.utils.jackson.ZoneIdSerializer;
 import lombok.Data;
@@ -24,9 +23,7 @@ public class HealthDto {
     @JsonProperty(value = "mode")
     private final String mode;
 
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    @JsonSerialize(using = TimestampSerializer.class)
-    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "timestamp")
     private final Instant timestamp = Instant.now();
 

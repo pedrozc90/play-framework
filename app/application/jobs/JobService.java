@@ -4,18 +4,14 @@ import domain.files.FileStorage;
 import domain.jobs.Job;
 import infrastructure.repositories.JobRepository;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class JobService {
 
-    private final JobRepository repository = JobRepository.getInstance();
-
-    private static JobService instance;
-
-    public static JobService getInstance() {
-        if (instance == null) {
-            instance = new JobService();
-        }
-        return instance;
-    }
+    @Inject
+    private JobRepository repository;
 
     // QUERY
     public Job get(final Long id) {

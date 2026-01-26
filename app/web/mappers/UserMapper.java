@@ -4,19 +4,12 @@ import core.utils.DateUtils;
 import domain.users.User;
 import web.dtos.UserDto;
 
+import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.UUID;
 
+@Singleton
 public class UserMapper implements EntityMapper<User, UserDto> {
-
-    private static UserMapper instance;
-
-    public static UserMapper getInstance() {
-        if (instance == null) {
-            instance = new UserMapper();
-        }
-        return instance;
-    }
 
     @Override
     public UserDto toDto(final User entity) {

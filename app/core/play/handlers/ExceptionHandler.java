@@ -2,50 +2,65 @@ package core.play.handlers;
 
 import core.exceptions.AppException;
 import core.play.utils.ResultBuilder;
+import play.Configuration;
+import play.Environment;
+import play.api.OptionalSourceMapper;
+import play.api.UsefulException;
+import play.api.routing.Router;
+import play.http.DefaultHttpErrorHandler;
 import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 
-public class ExceptionHandler {
+import javax.inject.Inject;
+import javax.inject.Provider;
+import javax.inject.Singleton;
 
-    private static ExceptionHandler instance;
+@Singleton
+public class ExceptionHandler extends DefaultHttpErrorHandler {
 
-    public static ExceptionHandler getInstance() {
-        if (instance == null) {
-            instance = new ExceptionHandler();
+    @Inject
+    public ExceptionHandler(
+        Configuration configuration,
+        Environment environment,
+        OptionalSourceMapper sourceMapper,
+        Provider<Router> routes
+    ) {
+        super(configuration, environment, sourceMapper, routes);
+    }
+
+    @Override
+    protected F.Promise<Result> onBadRequest(final Http.RequestHeader request, final String message) {
+        return F.Promise.pure(ResultBuilder.of().message(message).badRequest());
+    }
+
+    @Override
+    protected F.Promise<Result> onForbidden(final Http.RequestHeader request, final String message) {
+        return F.Promise.pure(ResultBuilder.of().message(message).forbidden());
+    }
+
+    @Override
+    protected F.Promise<Result> onNotFound(final Http.RequestHeader request, final String message) {
+        return F.Promise.pure(ResultBuilder.of().message(message).notFound());
+    }
+
+    @Override
+    protected F.Promise<Result> onOtherClientError(final Http.RequestHeader request, final int status, final String message) {
+        return F.Promise.pure(ResultBuilder.of().message(message).status(status).toResult());
+    }
+
+    @Override
+    public F.Promise<Result> onServerError(final Http.RequestHeader request, final Throwable exception) {
+        final AppException captured = captureException(exception, AppException.class);
+        if (captured != null) {
+            return F.Promise.pure(captured.toResult());
         }
-        return instance;
+        return super.onServerError(request, exception);
     }
 
-    public F.Promise<Result> onBadRequest(final Http.RequestHeader request, final String error) {
-        return F.Promise.pure(
-            ResultBuilder.of()
-                .message(error)
-                .badRequest()
-        );
-    }
-
-    public F.Promise<Result> onHandlerNotFound(final Http.RequestHeader request) {
-        final String method = request.method();
-        final String path = request.path();
-        return F.Promise.pure(
-            ResultBuilder.of()
-                .message("Resource %s %s not found", method, path)
-                .notFound()
-        );
-    }
-
-    public F.Promise<Result> onError(final Http.RequestHeader request, final Throwable exception) {
-        final AppException cause = captureException(exception, AppException.class);
-        if (cause != null) {
-            return F.Promise.pure(cause.toResult());
-        }
-
-        return F.Promise.pure(
-            ResultBuilder.of()
-                .message(exception.getMessage())
-                .internalServerError()
-        );
+    @Override
+    protected void logServerError(final Http.RequestHeader request, final UsefulException usefulException) {
+        super.logServerError(request, usefulException);
     }
 
     private <T extends Throwable> T captureException(final Throwable exception, final Class<T> clazz, final int depth) {

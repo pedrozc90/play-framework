@@ -1,10 +1,7 @@
 package web.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import core.utils.jackson.TimestampDeserializer;
-import core.utils.jackson.TimestampSerializer;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
@@ -23,15 +20,11 @@ public abstract class AuditEntityDto implements Serializable {
     @JsonProperty(value = "uuid")
     private final UUID uuid;
 
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    @JsonSerialize(using = TimestampSerializer.class)
-    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "inserted_at")
     private final Instant insertedAt;
 
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    @JsonSerialize(using = TimestampSerializer.class)
-    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "updated_at")
     private final Instant updatedAt;
 

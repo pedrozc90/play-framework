@@ -9,21 +9,24 @@ import domain.users.User;
 import web.controllers.auth.objects.LoginResponse;
 import web.security.objects.UserContext;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
 
+@Singleton
 public class AuthenticationService {
 
-    private final UserService userService = UserService.getInstance();
-    private final TokenService tokenService = TokenService.getInstance();
+    private final UserService userService;
+    private final TokenService tokenService;
 
-    private static AuthenticationService instance;
-
-    public static AuthenticationService getInstance() {
-        if (instance == null) {
-            instance = new AuthenticationService();
-        }
-        return instance;
+    @Inject
+    public AuthenticationService(
+        final UserService userService,
+        final TokenService tokenService
+    ) {
+        this.userService = userService;
+        this.tokenService = tokenService;
     }
 
     public UserContext validate(final String token) throws AppException {

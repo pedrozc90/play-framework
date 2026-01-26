@@ -1,10 +1,7 @@
 package web.dtos;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import core.utils.jackson.TimestampDeserializer;
-import core.utils.jackson.TimestampSerializer;
 import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
 import lombok.EqualsAndHashCode;
@@ -32,15 +29,11 @@ public class TaskDto extends AuditEntityDto implements Serializable {
     @JsonProperty(value = "stack_trace")
     private final String stackTrace;
 
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    @JsonSerialize(using = TimestampSerializer.class)
-    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "started_at")
     private final Instant startedAt;
 
-    // @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
-    @JsonSerialize(using = TimestampSerializer.class)
-    @JsonDeserialize(using = TimestampDeserializer.class)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", timezone = "UTC")
     @JsonProperty(value = "completed_at")
     private final Instant completedAt;
 

@@ -6,21 +6,16 @@ import domain.jobs.Job;
 import web.dtos.FileStorageDto;
 import web.dtos.JobDto;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.time.Instant;
 import java.util.UUID;
 
+@Singleton
 public class JobMapper implements EntityMapper<Job, JobDto> {
 
-    private final FileStorageMapper fileStorageMapper = FileStorageMapper.getInstance();
-
-    private static JobMapper instance;
-
-    public static JobMapper getInstance() {
-        if (instance == null) {
-            instance = new JobMapper();
-        }
-        return instance;
-    }
+    @Inject
+    private FileStorageMapper fileStorageMapper;
 
     @Override
     public JobDto toDto(final Job entity) {

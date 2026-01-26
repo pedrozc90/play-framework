@@ -2,22 +2,18 @@ package infrastructure.repositories;
 
 import domain.files.FileStorage;
 import domain.jobs.Job;
+import play.db.jpa.JPAApi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.persistence.NoResultException;
 
+@Singleton
 public class JobRepository extends JpaRepository<Job, Long> {
 
-    private static JobRepository instance;
-
-    public static JobRepository getInstance() {
-        if (instance == null) {
-            instance = new JobRepository();
-        }
-        return instance;
-    }
-
-    public JobRepository() {
-        super(Job.class);
+        @Inject
+    public JobRepository(final JPAApi jpa) {
+        super(jpa, Job.class);
     }
 
     public Job get(final FileStorage file) {

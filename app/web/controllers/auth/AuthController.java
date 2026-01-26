@@ -16,12 +16,21 @@ import web.security.annotations.RequiresRole;
 import web.security.objects.Attrs;
 import web.security.objects.UserContext;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class AuthController extends Controller {
 
-    private static final AuthenticationService service = AuthenticationService.getInstance();
+    private final AuthenticationService service;
+
+    @Inject
+    public AuthController(final AuthenticationService service) {
+        this.service = service;
+    }
 
     @Transactional
-    public static Result login() throws AppException {
+    public Result login() throws AppException {
         final JsonNode body = request().body().asJson();
         final LoginRequest data = Json.fromJson(body, LoginRequest.class);
 
@@ -33,7 +42,7 @@ public class AuthController extends Controller {
     }
 
     @Authenticated
-    public static Result logout() {
+    public Result logout() {
         final Http.Cookie cookie = request().cookie("TOKEN");
         if (cookie != null) {
             response().discardCookie("TOKEN");
@@ -42,7 +51,7 @@ public class AuthController extends Controller {
     }
 
     @Authenticated
-    public static Result context() {
+    public Result context() {
         final Http.Context ctx = Http.Context.current();
         final UserContext context = (UserContext) ctx.args.get(Attrs.USER_CONTEXT);
         return ResultBuilder.of(context).ok();
@@ -50,7 +59,7 @@ public class AuthController extends Controller {
 
     @Authenticated
     @RequiresRole({ "admin" })
-    public static Result permissions() {
+    public Result permissions() {
         return ResultBuilder.of("You shouldn't be seeing this message").ok();
     }
 

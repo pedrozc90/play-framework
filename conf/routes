@@ -1,7 +1,7 @@
 # Routes
-GET        /                    web.controllers.Application.index()
+GET        /                    @web.controllers.Application.index()
 
-GET        /health              web.controllers.health.HealthController.health()
+GET        /health              @web.controllers.health.HealthController.health()
 
 ->         /api                 auth.Routes
 ->         /api/users           users.Routes

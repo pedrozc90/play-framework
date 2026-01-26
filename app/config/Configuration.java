@@ -4,24 +4,13 @@ import core.utils.StringUtils;
 import play.Application;
 import play.Play;
 
+import javax.inject.Singleton;
 import java.time.Duration;
 
+@Singleton
 public class Configuration {
 
     private final Application application = Play.application();
-
-    private static Configuration instance;
-
-    public static Configuration getInstance() {
-        if (instance == null) {
-            synchronized (Configuration.class) {
-                if (instance == null) {
-                    instance = new Configuration();
-                }
-            }
-        }
-        return instance;
-    }
 
     public boolean isProduction() {
         return application.isProd();
@@ -43,24 +32,24 @@ public class Configuration {
     }
 
     public String name() {
-        return getAsString("application.name");
+        return getAsString("app.name");
     }
 
     public String version() {
-        return getAsString("application.version");
+        return getAsString("app.version");
     }
 
     public String getJwtSecret() {
-        return getAsString("application.jwt.secret");
+        return getAsString("app.jwt.secret");
     }
 
     public String getJwtIssuer() {
-        return getAsString("application.jwt.issuer");
+        return getAsString("app.jwt.issuer");
     }
 
     public Duration getJwtExpiration() {
         try {
-            final String value = getAsString("application.jwt.expiration");
+            final String value = getAsString("app.jwt.expiration");
             return StringUtils.parseDuration(value);
         } catch (ArithmeticException e) {
             return null;

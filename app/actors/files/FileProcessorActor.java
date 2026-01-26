@@ -24,14 +24,22 @@ import java.util.concurrent.RecursiveTask;
 public class FileProcessorActor extends BaseActor {
 
     private static final int MAX_RETRIES = 5;
-    private final TaskService taskService = TaskService.getInstance();
-    private final FileStorageService fsService = FileStorageService.getInstance();
-    private final TaskExecutor executor = TaskExecutor.getInstance();
+    private final TaskService taskService;
+    private final FileStorageService fsService;
+    private final TaskExecutor executor;
 
     private final ActorRef dispatcher;
 
-    private FileProcessorActor(final ActorRef dispatcher) {
+    private FileProcessorActor(
+        final TaskService taskService,
+        final FileStorageService fsService,
+        final TaskExecutor executor,
+        final ActorRef dispatcher
+    ) {
         super();
+        this.taskService = taskService;
+        this.fsService = fsService;
+        this.executor = executor;
         this.dispatcher = dispatcher;
     }
 
@@ -74,8 +82,8 @@ public class FileProcessorActor extends BaseActor {
     }
 
     // API
-    public static Props props(final ActorRef dispatcher) {
-        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(dispatcher));
+    public static Props props(final TaskService taskService, final FileStorageService fsService, final TaskExecutor executor, final ActorRef dispatcher) {
+        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(taskService, fsService, executor, dispatcher));
     }
 
     // MESSAGES

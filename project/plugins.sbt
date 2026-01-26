@@ -6,7 +6,7 @@ resolvers ++= Seq(
 )
 
 // the play plugin
-addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.3.9")
+addSbtPlugin("com.typesafe.play" % "sbt-plugin" % "2.4.11")
 
 // dependency graph plugin
 addSbtPlugin("net.virtual-void" % "sbt-dependency-graph" % "0.10.0-RC1")

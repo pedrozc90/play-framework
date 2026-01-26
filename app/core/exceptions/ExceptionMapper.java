@@ -3,22 +3,15 @@ package core.exceptions;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import core.utils.validation.Violation;
 
+import javax.inject.Singleton;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Singleton
 public class ExceptionMapper {
-
-    private static ExceptionMapper instance;
-
-    public static ExceptionMapper getInstance() {
-        if (instance == null) {
-            instance = new ExceptionMapper();
-        }
-        return instance;
-    }
 
     public Violation of(final ConstraintViolation<?> violation) {
         final String field = getField(violation);

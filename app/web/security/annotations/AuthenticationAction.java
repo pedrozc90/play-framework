@@ -11,9 +11,16 @@ import play.mvc.Result;
 import web.security.objects.Attrs;
 import web.security.objects.UserContext;
 
+import javax.inject.Inject;
+
 public class AuthenticationAction extends Action<Authenticated> {
 
-    private final AuthenticationService service = AuthenticationService.getInstance();
+    private final AuthenticationService service;
+
+    @Inject
+    public AuthenticationAction(final AuthenticationService service) {
+        this.service = service;
+    }
 
     @Override
     public F.Promise<Result> call(final Http.Context ctx) throws Throwable {

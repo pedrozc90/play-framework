@@ -6,11 +6,20 @@ import play.mvc.Controller;
 import play.mvc.Result;
 import web.controllers.health.objects.HealthDto;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class HealthController extends Controller {
 
-    private static final HealthService service = HealthService.getInstance();
+    private final HealthService service;
 
-    public static Result health() {
+    @Inject
+    public HealthController(final HealthService service) {
+        this.service = service;
+    }
+
+    public Result health() {
         final HealthDto dto = service.create();
         return ResultBuilder.of(dto).ok();
     }

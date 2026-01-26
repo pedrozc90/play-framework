@@ -1,20 +1,17 @@
 package infrastructure.repositories;
 
 import domain.tasks.Task;
+import play.db.jpa.JPAApi;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
+
+@Singleton
 public class TaskRepository extends JpaRepository<Task, Long> {
 
-    private static TaskRepository instance;
-
-    public static TaskRepository getInstance() {
-        if (instance == null) {
-            instance = new TaskRepository();
-        }
-        return instance;
-    }
-
-    public TaskRepository() {
-        super(Task.class);
+    @Inject
+    public TaskRepository(final JPAApi jpa) {
+        super(jpa, Task.class);
     }
 
 }
