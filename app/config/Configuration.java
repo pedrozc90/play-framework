@@ -2,15 +2,25 @@ package config;
 
 import core.utils.StringUtils;
 import play.Application;
-import play.Play;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.time.Duration;
 
 @Singleton
 public class Configuration {
 
-    private final Application application = Play.application();
+    private final Application application;
+    private final play.Configuration configuration;
+
+    @Inject
+    public Configuration(
+        final Application application,
+        final play.Configuration configuration
+    ) {
+        this.application = application;
+        this.configuration = configuration;
+    }
 
     public boolean isProduction() {
         return application.isProd();
@@ -44,29 +54,45 @@ public class Configuration {
     }
 
     public String getJwtIssuer() {
-        return getAsString("app.jwt.issuer");
+        return configuration.getString("app.jwt.issuer");
     }
 
     public Duration getJwtExpiration() {
-        try {
-            final String value = getAsString("app.jwt.expiration");
-            return StringUtils.parseDuration(value);
-        } catch (ArithmeticException e) {
-            return null;
-        }
+        return getAsDuration("app.jwt.expiration");
+    }
+
+    public String getCookiesDomain() {
+        return getAsString("app.jwt.cookies.domain");
+    }
+
+    public boolean getCookiesSecure() {
+        return getAsBoolean("app.jwt.cookies.secure");
+    }
+
+    public Duration getCookiesMaxAge() {
+        return getAsDuration("app.jwt.cookies.max-age");
     }
 
     // HELPERS
     private String getAsString(final String key) {
-        return application.configuration().getString(key);
+        return configuration.getString(key);
     }
 
     private Integer getAsInteger(final String key) {
-        return application.configuration().getInt(key);
+        return configuration.getInt(key);
     }
 
     private boolean getAsBoolean(final String key) {
-        return application.configuration().getBoolean(key) == Boolean.TRUE;
+        return configuration.getBoolean(key) == Boolean.TRUE;
+    }
+
+    private Duration getAsDuration(final String key) {
+        try {
+            final String value = getAsString(key);
+            return StringUtils.parseDuration(value);
+        } catch (ArithmeticException e) {
+            return null;
+        }
     }
 
 }

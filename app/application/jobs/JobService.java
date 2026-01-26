@@ -6,6 +6,7 @@ import infrastructure.repositories.JobRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManager;
 
 @Singleton
 public class JobService {
@@ -23,12 +24,12 @@ public class JobService {
     }
 
     // METHODS
-    public Job create(final FileStorage file) {
+    public Job create(final EntityManager em, final FileStorage file) {
         final Job obj = new Job();
         obj.setStatus(Job.Status.PENDING);
         obj.setFile(file);
 
-        return repository.persist(obj);
+        return repository.persist(em, obj);
     }
 
 }

@@ -1,4 +1,4 @@
-lazy val scala2 = "2.11.1"
+lazy val scala2 = "2.11.12"
 
 lazy val root = (project in file("."))
     .enablePlugins(PlayJava)
@@ -34,8 +34,8 @@ lazy val root = (project in file("."))
             "org.hibernate.javax.persistence" % "hibernate-jpa-2.1-api" % "1.0.0.Final",
 
             // Jackson
-            "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.5.4",
-            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.5.4",
+            "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.7.8",
+            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.7.8",
 
             // Validation
             "javax.el" % "el-api" % "2.2",
@@ -52,6 +52,6 @@ lazy val root = (project in file("."))
 
             // Testing
             "junit" % "junit" % "4.13.2" % Test,
-            "com.typesafe.play" %% "play-test" % "2.4.11" % Test
+            "com.typesafe.play" %% "play-test" % "2.5.19" % Test
         )
     )

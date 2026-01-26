@@ -9,7 +9,6 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
 import akka.routing.RoundRobinPool;
-import application.files.FileStorageService;
 import application.jobs.JobService;
 import application.tasks.TaskService;
 import domain.files.FileStorage;
@@ -31,7 +30,6 @@ public class FileDispatcherActor extends BaseActor {
 
     private final JobService jobService;
     private final TaskService taskService;
-    private final FileStorageService fsService;
     private final TaskExecutor executor;
 
     private final Queue<FileProcessorActor.Command> queue = new ConcurrentLinkedQueue<>();
@@ -42,14 +40,12 @@ public class FileDispatcherActor extends BaseActor {
     public FileDispatcherActor(
         final JobService jobService,
         final TaskService taskService,
-        final FileStorageService fsService,
         final TaskExecutor executor,
         final int parallelism
     ) {
         super();
         this.jobService = jobService;
         this.taskService = taskService;
-        this.fsService = fsService;
         this.executor = executor;
         this.parallelism = parallelism;
     }
@@ -69,7 +65,7 @@ public class FileDispatcherActor extends BaseActor {
     @Override
     protected void onInit(Init obj) {
         super.onInit(obj);
-        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(taskService, fsService, executor, self())));
+        this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(taskService, executor, self())));
     }
 
     private void onEnqueue(final Enqueue cmd) {
@@ -120,10 +116,9 @@ public class FileDispatcherActor extends BaseActor {
     // PROPS
     public static Props props(final JobService jobService,
                               final TaskService taskService,
-                              final FileStorageService fsService,
                               final TaskExecutor executor,
                               final int parallelism) {
-        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(jobService, taskService, fsService, executor, parallelism));
+        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(jobService, taskService, executor, parallelism));
     }
 
     @Data

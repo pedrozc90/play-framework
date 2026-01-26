@@ -8,6 +8,7 @@ import play.mvc.Result;
 
 import javax.validation.ConstraintViolationException;
 import java.util.List;
+import java.util.concurrent.CompletionException;
 
 @Getter
 public class AppException extends Exception {
@@ -58,6 +59,10 @@ public class AppException extends Exception {
             return build.badRequest();
         }
         return build.status(status.getCode()).toResult();
+    }
+
+    public CompletionException toCompletionException() {
+        return new CompletionException(this);
     }
 
 }

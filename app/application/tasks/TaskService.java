@@ -1,15 +1,19 @@
 package application.tasks;
 
 
+import application.files.FileStorageService;
+import core.objects.FileMetadata;
 import domain.files.FileStorage;
 import domain.jobs.Job;
 import domain.tasks.Task;
 import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
 import infrastructure.repositories.TaskRepository;
+import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import javax.persistence.EntityManager;
 import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,8 +22,20 @@ import java.util.stream.Stream;
 @Singleton
 public class TaskService {
 
+    private final JPAApi jpa;
+    private final TaskRepository repository;
+    private final FileStorageService fsService;
+
     @Inject
-    private TaskRepository repository;
+    public TaskService(
+        final JPAApi jpa,
+        final TaskRepository repository,
+        final FileStorageService fsService
+    ) {
+        this.jpa = jpa;
+        this.repository = repository;
+        this.fsService = fsService;
+    }
 
     // QUERY
     public Task get(final Long id) {
@@ -41,8 +57,8 @@ public class TaskService {
         return repository.persist(obj);
     }
 
-    public void update(final Long id, final TaskStatus status) {
-        final Task task = repository.findById(id);
+    public void update(final EntityManager em, final Long id, final TaskStatus status) {
+        final Task task = repository.findById(em, id);
         task.setStatus(status);
         // TODO: do we need to persist ???
         // repository.persist(task);
@@ -68,6 +84,20 @@ public class TaskService {
             return false;
         }
         return true;
+    }
+
+    public FileStorage completeTask(final Long taskId, final TaskStatus status, final FileMetadata result) {
+        return jpa.withTransaction((em) -> {
+            this.update(em, taskId, status);
+            if (result != null) {
+                return fsService.create(result.getFilename(), result.getBytes());
+            }
+            return null;
+        });
+    }
+
+    public FileStorage completeTask(final Long taskId, final TaskStatus status) {
+        return completeTask(taskId, status, null);
     }
 
 }

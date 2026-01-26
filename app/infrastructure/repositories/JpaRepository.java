@@ -31,9 +31,13 @@ public abstract class JpaRepository<T, ID> {
         return findById(em(), id);
     }
 
-    public T persist(final T entity) {
-        em().persist(entity);
+    public T persist(final EntityManager em, final T entity) {
+        em.persist(entity);
         return entity;
+    }
+
+    public T persist(final T entity) {
+        return persist(em(), entity);
     }
 
     public T merge(final T entity) {

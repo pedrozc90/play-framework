@@ -8,13 +8,14 @@ import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
 import play.api.routing.Router;
 import play.http.DefaultHttpErrorHandler;
-import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class ExceptionHandler extends DefaultHttpErrorHandler {
@@ -30,30 +31,30 @@ public class ExceptionHandler extends DefaultHttpErrorHandler {
     }
 
     @Override
-    protected F.Promise<Result> onBadRequest(final Http.RequestHeader request, final String message) {
-        return F.Promise.pure(ResultBuilder.of().message(message).badRequest());
+    protected CompletionStage<Result> onBadRequest(final Http.RequestHeader request, final String message) {
+        return CompletableFuture.completedFuture(ResultBuilder.of().message(message).badRequest());
     }
 
     @Override
-    protected F.Promise<Result> onForbidden(final Http.RequestHeader request, final String message) {
-        return F.Promise.pure(ResultBuilder.of().message(message).forbidden());
+    protected CompletionStage<Result> onForbidden(final Http.RequestHeader request, final String message) {
+        return CompletableFuture.completedFuture(ResultBuilder.of().message(message).forbidden());
     }
 
     @Override
-    protected F.Promise<Result> onNotFound(final Http.RequestHeader request, final String message) {
-        return F.Promise.pure(ResultBuilder.of().message(message).notFound());
+    protected CompletionStage<Result> onNotFound(final Http.RequestHeader request, final String message) {
+        return CompletableFuture.completedFuture(ResultBuilder.of().message(message).notFound());
     }
 
     @Override
-    protected F.Promise<Result> onOtherClientError(final Http.RequestHeader request, final int status, final String message) {
-        return F.Promise.pure(ResultBuilder.of().message(message).status(status).toResult());
+    protected CompletionStage<Result> onOtherClientError(final Http.RequestHeader request, final int status, final String message) {
+        return CompletableFuture.completedFuture(ResultBuilder.of().message(message).status(status).toResult());
     }
 
     @Override
-    public F.Promise<Result> onServerError(final Http.RequestHeader request, final Throwable exception) {
+    public CompletionStage<Result> onServerError(final Http.RequestHeader request, final Throwable exception) {
         final AppException captured = captureException(exception, AppException.class);
         if (captured != null) {
-            return F.Promise.pure(captured.toResult());
+            return CompletableFuture.completedFuture(captured.toResult());
         }
         return super.onServerError(request, exception);
     }

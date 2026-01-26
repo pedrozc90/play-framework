@@ -1,10 +1,10 @@
 package web.security.annotations;
 
 import application.auth.AuthenticationService;
-import core.play.utils.CookieUtils;
+import core.exceptions.AppException;
 import core.play.utils.ResultBuilder;
 import core.utils.http.HttpHeaders;
-import play.libs.F;
+import play.Logger;
 import play.mvc.Action;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -12,8 +12,12 @@ import web.security.objects.Attrs;
 import web.security.objects.UserContext;
 
 import javax.inject.Inject;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 public class AuthenticationAction extends Action<Authenticated> {
+
+    private static final Logger.ALogger logger = Logger.of(AuthenticationAction.class);
 
     private final AuthenticationService service;
 
@@ -23,14 +27,12 @@ public class AuthenticationAction extends Action<Authenticated> {
     }
 
     @Override
-    public F.Promise<Result> call(final Http.Context ctx) throws Throwable {
-        final String type = configuration.type().toLowerCase();
-
+    public CompletionStage<Result> call(final Http.Context ctx) {
         final Http.Request req = ctx.request();
         try {
-            final String accessToken = getAccessToken(type, req);
+            final String accessToken = extractAccessToken(req, configuration.values());
             if (accessToken == null) {
-                return F.Promise.pure(ResultBuilder.of("Token is missing").unauthorized());
+                return CompletableFuture.completedFuture(ResultBuilder.of("Token is missing").unauthorized());
             }
 
             final UserContext context = service.validate(accessToken);
@@ -39,22 +41,35 @@ public class AuthenticationAction extends Action<Authenticated> {
             ctx.args.put(Attrs.USER_CONTEXT, context);
 
             return delegate.call(ctx);
+        } catch (AppException e) {
+            throw e.toCompletionException();
         } finally {
             // clear context
             ctx.args.remove(Attrs.USER_CONTEXT);
         }
     }
 
-    /* HELPERS */
-    private String getAccessToken(final String type, final Http.Request req) {
-        if (type != null) {
-            if (type.equals("cookie")) {
-                return getAccessTokenCookie(req);
-            }
+    private String extractAccessToken(final Http.Request request, final AuthSource[] sources) {
+        for (AuthSource source : sources) {
+            final String t = extractAccessToken(request, source);
+            if (t != null && !t.isEmpty()) return t;
         }
-        return getBearerToken(req);
+        return null;
     }
 
+    private String extractAccessToken(final Http.Request request, final AuthSource source) {
+        if (source == null) return null;
+        switch (source) {
+            case BEARER:
+                return extractBearer(request);
+            case COOKIE:
+                return extractCookie(request);
+            default:
+                return null;
+        }
+    }
+
+    /* --- Headers --- */
     private String getHeader(final Http.Request req, final String name) {
         return req.getHeader(name);
     }
@@ -63,15 +78,29 @@ public class AuthenticationAction extends Action<Authenticated> {
         return getHeader(req, HttpHeaders.AUTHORIZATION);
     }
 
-    private String getBearerToken(final Http.Request req) {
-        final String authorization = getAuthorization(req);
-        if (authorization == null) return null;
-        return authorization.replace("Bearer", "").trim();
+    protected String extractBearer(final Http.Request request) {
+        final String authorization = getAuthorization(request);
+        if (authorization == null || authorization.isEmpty()) {
+            logger.trace("Authorization header is missing");
+            return null;
+        }
+
+        if (authorization.startsWith("Bearer ")) {
+            return authorization.substring("Bearer ".length()).trim();
+        } else {
+            logger.trace("Authorization header is not 'Bearer'");
+        }
+
+        return null;
     }
 
-    private String getAccessTokenCookie(final Http.Request req) {
-        final Http.Cookie cookie = CookieUtils.getAccessToken(req);
-        if (cookie == null) return null;
+    /* --- Cookies --- */
+    protected String extractCookie(final Http.Request request) {
+        final Http.Cookie cookie = service.captureCookie(request);
+        if (cookie == null) {
+            logger.trace("Cookie '{}' is missing", AuthenticationService.COOKIE_NAME);
+            return null;
+        }
         return cookie.value();
     }
 

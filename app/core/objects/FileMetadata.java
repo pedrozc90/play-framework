@@ -25,7 +25,7 @@ public class FileMetadata {
         return new FileMetadata(filename, bytes, contentType);
     }
 
-    public static FileMetadata of(final Http.MultipartFormData.FilePart part) throws AppException {
+    public static FileMetadata of(final Http.MultipartFormData.FilePart<File> part) throws AppException {
         final File file = part.getFile();
         final String filename = part.getFilename();
         final String contentType = part.getContentType();

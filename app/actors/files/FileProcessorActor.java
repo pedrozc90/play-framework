@@ -8,14 +8,12 @@ import actors.tasks.TaskExecutor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 import akka.japi.pf.ReceiveBuilder;
-import application.files.FileStorageService;
 import application.tasks.TaskService;
 import core.objects.FileMetadata;
 import domain.files.FileStorage;
 import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
 import lombok.Data;
-import play.db.jpa.JPA;
 import scala.PartialFunction;
 import scala.runtime.BoxedUnit;
 
@@ -25,20 +23,17 @@ public class FileProcessorActor extends BaseActor {
 
     private static final int MAX_RETRIES = 5;
     private final TaskService taskService;
-    private final FileStorageService fsService;
     private final TaskExecutor executor;
 
     private final ActorRef dispatcher;
 
     private FileProcessorActor(
         final TaskService taskService,
-        final FileStorageService fsService,
         final TaskExecutor executor,
         final ActorRef dispatcher
     ) {
         super();
         this.taskService = taskService;
-        this.fsService = fsService;
         this.executor = executor;
         this.dispatcher = dispatcher;
     }
@@ -64,17 +59,13 @@ public class FileProcessorActor extends BaseActor {
 
             final FileMetadata result = executor.execute(task);
 
-            JPA.withTransaction(() -> {
-                taskService.update(cmd.taskId, TaskStatus.DONE);
-
-                final FileStorage fs = fsService.create(result.getFilename(), result.getBytes());
-                logger.info("New file storage created: {}", fs);
-            });
+            final FileStorage fs = taskService.completeTask(cmd.taskId, TaskStatus.DONE, result);
+            logger.info("New file storage created: {}", fs);
         } catch (Exception e) {
             int retries = cmd.retries + 1;
             if (retries > MAX_RETRIES) {
                 logger.error("Failed to process command: {}", cmd);
-                JPA.withTransaction(() -> taskService.update(cmd.taskId, TaskStatus.FAILED));
+                taskService.completeTask(cmd.taskId, TaskStatus.FAILED);
             } else {
                 dispatcher.tell(cmd.withRetries(retries), self());
             }
@@ -82,8 +73,8 @@ public class FileProcessorActor extends BaseActor {
     }
 
     // API
-    public static Props props(final TaskService taskService, final FileStorageService fsService, final TaskExecutor executor, final ActorRef dispatcher) {
-        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(taskService, fsService, executor, dispatcher));
+    public static Props props(final TaskService taskService, final TaskExecutor executor, final ActorRef dispatcher) {
+        return Props.create(FileProcessorActor.class, () -> new FileProcessorActor(taskService, executor, dispatcher));
     }
 
     // MESSAGES

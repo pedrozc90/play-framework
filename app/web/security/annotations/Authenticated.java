@@ -12,6 +12,6 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface Authenticated {
 
-    String type() default "bearer"; // "bearer", "cookie"
+    AuthSource[] values() default { AuthSource.BEARER };
 
 }

@@ -11,13 +11,14 @@ import javax.persistence.NoResultException;
 @Singleton
 public class JobRepository extends JpaRepository<Job, Long> {
 
-        @Inject
+    @Inject
     public JobRepository(final JPAApi jpa) {
         super(jpa, Job.class);
     }
 
     public Job get(final FileStorage file) {
         try {
+            if (file == null) return null;
             return em().createQuery("SELECT j FROM Job j WHERE j.file.id = :file_id", Job.class)
                 .setParameter("file_id", file.getId())
                 .getSingleResult();

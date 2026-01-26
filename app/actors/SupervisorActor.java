@@ -123,7 +123,7 @@ public class SupervisorActor extends BaseActor {
     @Override
     protected void onInit(final Init obj) {
         // initialize child actors
-        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(jobService, taskService, fsService, executor, 10), "FileDispatcherActor");
+        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(jobService, taskService, executor, 10), "FileDispatcherActor");
         // registerActor(FileProcessorActor.class, FileProcessorActor.props(self()), "FileProcessorActor");
 
         // create and start heartbeat scheduler

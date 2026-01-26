@@ -1,4 +1,6 @@
 <configuration>
+    <conversionRule conversionWord="coloredLevel" converterClass="play.api.libs.logback.ColoredLevel"/>
+
     <property name="LOGS_DIR" value="logs"/>
     <property name="ARCHIVE_DIR" value="${LOGS_DIR}/archive"/>
 

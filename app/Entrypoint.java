@@ -3,11 +3,11 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import core.utils.jackson.ObjectMapperProvider;
 import play.Logger;
 import play.inject.ApplicationLifecycle;
-import play.libs.F;
 import play.libs.Json;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
 
 // This creates an `ApplicationStart` object once at start-up.
 @Singleton
@@ -38,7 +38,7 @@ public class Entrypoint {
     private void onStop(final ApplicationLifecycle lifecycle) {
         lifecycle.addStopHook(() -> {
             logger.info("Application shutdown...");
-            return F.Promise.pure(null);
+            return CompletableFuture.completedFuture(null);
         });
     }
 
