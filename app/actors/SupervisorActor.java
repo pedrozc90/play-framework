@@ -9,15 +9,12 @@ import actors.tasks.TaskExecutor;
 import akka.actor.*;
 import akka.japi.Creator;
 import akka.japi.pf.DeciderBuilder;
-import akka.japi.pf.ReceiveBuilder;
-import application.files.FileStorageService;
-import application.jobs.JobService;
+import application.tasks.FileDispatcherService;
 import application.tasks.TaskService;
 import lombok.Data;
 import scala.PartialFunction;
 import scala.concurrent.duration.Duration;
 import scala.concurrent.duration.FiniteDuration;
-import scala.runtime.BoxedUnit;
 
 import javax.inject.Inject;
 import java.util.Map;
@@ -32,26 +29,23 @@ public class SupervisorActor extends BaseActor {
     private final Map<ActorRef, Class<?>> classes = new ConcurrentHashMap<>();
     private final Map<ActorRef, Long> heartbeats = new ConcurrentHashMap<>();
 
-    private final JobService jobService;
     private final TaskService taskService;
-    private final FileStorageService fsService;
     private final TaskExecutor executor;
+    private final FileDispatcherService service;
 
     private Cancellable heartbeat;
 
     // Guice injects these via bindActor()
     @Inject
     public SupervisorActor(
-        final JobService jobService,
         final TaskService taskService,
-        final FileStorageService fsService,
-        final TaskExecutor executor
+        final TaskExecutor executor,
+        final FileDispatcherService service
     ) {
         super();
-        this.jobService = jobService;
         this.taskService = taskService;
-        this.fsService = fsService;
         this.executor = executor;
+        this.service = service;
     }
 
     @Override
@@ -109,8 +103,8 @@ public class SupervisorActor extends BaseActor {
 
     // MESSAGE HANDLERS
     @Override
-    protected PartialFunction<Object, BoxedUnit> createReceive() {
-        return ReceiveBuilder
+    public Receive createReceive() {
+        return receiveBuilder()
             .match(Init.class, this::onInit)
             .match(Forward.class, this::onForward)
             .match(Heartbeat.class, this::onHeartbeat)
@@ -123,7 +117,7 @@ public class SupervisorActor extends BaseActor {
     @Override
     protected void onInit(final Init obj) {
         // initialize child actors
-        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(jobService, taskService, executor, 10), "FileDispatcherActor");
+        registerActor(FileDispatcherActor.class, FileDispatcherActor.props(taskService, executor, service, 10), "FileDispatcherActor");
         // registerActor(FileProcessorActor.class, FileProcessorActor.props(self()), "FileProcessorActor");
 
         // create and start heartbeat scheduler
@@ -208,8 +202,8 @@ public class SupervisorActor extends BaseActor {
     }
 
     // API
-    public static Props props(final JobService jobService, final TaskService taskService, final FileStorageService fsService, final TaskExecutor executor) {
-        return Props.create(SupervisorActor.class, () -> new SupervisorActor(jobService, taskService, fsService, executor));
+    public static Props props(final TaskService taskService, final TaskExecutor executor, final FileDispatcherService service) {
+        return Props.create(SupervisorActor.class, () -> new SupervisorActor(taskService, executor, service));
     }
 
     // MESSAGES

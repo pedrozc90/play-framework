@@ -7,15 +7,12 @@ import actors.tasks.ResizeImageTask;
 import actors.tasks.TaskExecutor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.japi.pf.ReceiveBuilder;
 import application.tasks.TaskService;
 import core.objects.FileMetadata;
 import domain.files.FileStorage;
 import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
 import lombok.Data;
-import scala.PartialFunction;
-import scala.runtime.BoxedUnit;
 
 import java.util.concurrent.RecursiveTask;
 
@@ -40,8 +37,8 @@ public class FileProcessorActor extends BaseActor {
 
     // RECEIVER
     @Override
-    protected PartialFunction<Object, BoxedUnit> createReceive() {
-        return ReceiveBuilder
+    public Receive createReceive() {
+        return receiveBuilder()
             .match(Init.class, this::onInit)
             .match(Command.class, this::onCommand)
             .matchAny(this::onUnknownMessage)

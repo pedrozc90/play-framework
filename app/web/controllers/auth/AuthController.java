@@ -36,7 +36,9 @@ public class AuthController extends Controller {
 
         final LoginResponse result = service.authenticate(data.getEmail(), data.getPassword());
 
-        response().setCookie("TOKEN", result.getToken(), 3_600, "/", null, false, true);
+        final Http.Cookie cookie = service.createCookie(result.getToken());
+
+        response().setCookie(cookie);
 
         return ResultBuilder.of(result).ok();
     }

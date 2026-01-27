@@ -1,7 +1,7 @@
 package config;
 
-import core.utils.StringUtils;
-import play.Application;
+import com.typesafe.config.Config;
+import play.Environment;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -10,35 +10,32 @@ import java.time.Duration;
 @Singleton
 public class Configuration {
 
-    private final Application application;
-    private final play.Configuration configuration;
+    private final Config config;
+    private final Environment environment;
 
     @Inject
     public Configuration(
-        final Application application,
-        final play.Configuration configuration
+        final Config config,
+        final Environment environment
     ) {
-        this.application = application;
-        this.configuration = configuration;
+        this.config = config;
+        this.environment = environment;
     }
 
     public boolean isProduction() {
-        return application.isProd();
+        return environment.isProd();
     }
 
     public boolean isDevelopment() {
-        return application.isDev();
+        return environment.isDev();
     }
 
     public boolean isTest() {
-        return application.isTest();
+        return environment.isTest();
     }
 
     public String mode() {
-        if (isProduction()) return "production";
-        else if (isDevelopment()) return "development";
-        else if (isTest()) return "test";
-        return "none";
+        return environment.mode().name().toLowerCase();
     }
 
     public String name() {
@@ -54,7 +51,7 @@ public class Configuration {
     }
 
     public String getJwtIssuer() {
-        return configuration.getString("app.jwt.issuer");
+        return getAsString("app.jwt.issuer");
     }
 
     public Duration getJwtExpiration() {
@@ -75,24 +72,19 @@ public class Configuration {
 
     // HELPERS
     private String getAsString(final String key) {
-        return configuration.getString(key);
+        return config.getString(key);
     }
 
     private Integer getAsInteger(final String key) {
-        return configuration.getInt(key);
+        return config.getInt(key);
     }
 
     private boolean getAsBoolean(final String key) {
-        return configuration.getBoolean(key) == Boolean.TRUE;
+        return config.getBoolean(key);
     }
 
     private Duration getAsDuration(final String key) {
-        try {
-            final String value = getAsString(key);
-            return StringUtils.parseDuration(value);
-        } catch (ArithmeticException e) {
-            return null;
-        }
+        return config.getDuration(key);
     }
 
 }

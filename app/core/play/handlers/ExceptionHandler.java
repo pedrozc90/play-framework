@@ -1,8 +1,8 @@
 package core.play.handlers;
 
+import com.typesafe.config.Config;
 import core.exceptions.AppException;
 import core.play.utils.ResultBuilder;
-import play.Configuration;
 import play.Environment;
 import play.api.OptionalSourceMapper;
 import play.api.UsefulException;
@@ -22,12 +22,12 @@ public class ExceptionHandler extends DefaultHttpErrorHandler {
 
     @Inject
     public ExceptionHandler(
-        Configuration configuration,
-        Environment environment,
-        OptionalSourceMapper sourceMapper,
-        Provider<Router> routes
+        final Config config,
+        final Environment environment,
+        final OptionalSourceMapper sourceMapper,
+        final Provider<Router> routes
     ) {
-        super(configuration, environment, sourceMapper, routes);
+        super(config, environment, sourceMapper, routes);
     }
 
     @Override

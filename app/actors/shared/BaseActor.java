@@ -6,8 +6,6 @@ import actors.messages.Init;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.Terminated;
 import play.Logger;
-import scala.PartialFunction;
-import scala.runtime.BoxedUnit;
 
 public abstract class BaseActor extends AbstractLoggingActor {
 
@@ -15,7 +13,6 @@ public abstract class BaseActor extends AbstractLoggingActor {
 
     protected BaseActor() {
         logger = Logger.of(getClass());
-        receive(createReceive());
     }
 
     @Override
@@ -29,20 +26,6 @@ public abstract class BaseActor extends AbstractLoggingActor {
     public void postStop() {
         logger.debug("Actor stopped");
     }
-
-    /**
-     * Example:
-     * protected PartialFunction<Object, BoxedUnit> createReceive() {
-     * return ReceiveBuilder
-     * .match(Init.class, this::onInit)
-     * .match(Heartbeat.class, this::onHeartbeat)
-     * .match(HeartbeatAck.class, this::onHeartbeatAck)
-     * .match(Terminated.class, this::onTerminated)
-     * .matchAny(this::unhandled)
-     * .build();
-     * }
-     */
-    protected abstract PartialFunction<Object, BoxedUnit> createReceive();
 
     protected void onInit(final Init obj) {
         logger.info("Init message received: {}", obj);

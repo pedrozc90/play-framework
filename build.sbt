@@ -14,7 +14,8 @@ lazy val root = (project in file("."))
             "Maven" at "https://repo.maven.apache.org/maven2/"
         ),
         libraryDependencies ++= Seq(
-            cache,
+            guice,
+            ehcache,
             filters,
             jdbc,
             javaCore,
@@ -26,23 +27,22 @@ lazy val root = (project in file("."))
             "org.postgresql" % "postgresql" % "42.6.0",
 
             // Hibernate
-            "org.hibernate" % "hibernate-core" % "5.0.12.Final",
-            "org.hibernate" % "hibernate-entitymanager" % "5.0.12.Final",
-            "org.hibernate" % "hibernate-validator" % "5.0.3.Final",
+            "org.hibernate" % "hibernate-core" % "5.3.20.Final",
+            "org.hibernate" % "hibernate-entitymanager" % "5.3.20.Final",
+            "org.hibernate" % "hibernate-validator" % "5.4.3.Final",
 
             // Java Standard API
-            "org.hibernate.javax.persistence" % "hibernate-jpa-2.1-api" % "1.0.0.Final",
+            "org.hibernate.javax.persistence" % "hibernate-jpa-2.1-api" % "1.0.2",
 
             // Jackson
-            "com.fasterxml.jackson.datatype" % "jackson-datatype-jsr310" % "2.7.8",
-            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.7.8",
+            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.8.11",
 
             // Validation
             "javax.el" % "el-api" % "2.2",
             "org.glassfish.web" % "el-impl" % "2.2",
 
             // JWT
-            "com.auth0" % "java-jwt" % "2.3.0",
+            "com.auth0" % "java-jwt" % "3.2.0",
 
             // Query debugging
             "p6spy" % "p6spy" % "3.8.7",
@@ -52,6 +52,6 @@ lazy val root = (project in file("."))
 
             // Testing
             "junit" % "junit" % "4.13.2" % Test,
-            "com.typesafe.play" %% "play-test" % "2.5.19" % Test
+            "com.typesafe.play" %% "play-test" % "2.6.25" % Test
         )
     )

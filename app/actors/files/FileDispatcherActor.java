@@ -7,20 +7,12 @@ import actors.shared.BaseActor;
 import actors.tasks.TaskExecutor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
-import akka.japi.pf.ReceiveBuilder;
 import akka.routing.RoundRobinPool;
-import application.jobs.JobService;
+import application.tasks.FileDispatcherService;
 import application.tasks.TaskService;
-import domain.files.FileStorage;
-import domain.jobs.Job;
-import domain.tasks.Task;
 import lombok.Data;
-import play.db.jpa.JPA;
-import scala.PartialFunction;
-import scala.runtime.BoxedUnit;
 
 import java.util.Collections;
-import java.util.List;
 import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -28,9 +20,10 @@ import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class FileDispatcherActor extends BaseActor {
 
-    private final JobService jobService;
+    //    private final JobService jobService;
     private final TaskService taskService;
     private final TaskExecutor executor;
+    private final FileDispatcherService service;
 
     private final Queue<FileProcessorActor.Command> queue = new ConcurrentLinkedQueue<>();
     private final Set<FileProcessorActor.Command> actives = Collections.newSetFromMap(new ConcurrentHashMap<>());
@@ -38,21 +31,23 @@ public class FileDispatcherActor extends BaseActor {
     private ActorRef router;
 
     public FileDispatcherActor(
-        final JobService jobService,
+//        final JobService jobService,
         final TaskService taskService,
         final TaskExecutor executor,
+        final FileDispatcherService service,
         final int parallelism
     ) {
         super();
-        this.jobService = jobService;
+//        this.jobService = jobService;
         this.taskService = taskService;
         this.executor = executor;
+        this.service = service;
         this.parallelism = parallelism;
     }
 
     @Override
-    protected PartialFunction<Object, BoxedUnit> createReceive() {
-        return ReceiveBuilder
+    public Receive createReceive() {
+        return receiveBuilder()
             .match(Init.class, this::onInit)
             .match(Enqueue.class, this::onEnqueue)
             .match(Dequeue.class, this::onDequeue)
@@ -63,27 +58,14 @@ public class FileDispatcherActor extends BaseActor {
     }
 
     @Override
-    protected void onInit(Init obj) {
+    protected void onInit(final Init obj) {
         super.onInit(obj);
         this.router = context().actorOf(new RoundRobinPool(parallelism).props(FileProcessorActor.props(taskService, executor, self())));
     }
 
     private void onEnqueue(final Enqueue cmd) {
         logger.info("Received enqueue command: {}", cmd);
-        JPA.withTransaction(() -> {
-            final Job job = jobService.get(cmd.jobId);
-            job.setStatus(Job.Status.PROCESSING);
-
-            final FileStorage fs = job.getFile();
-
-            final List<Task> tasks = taskService.generateAll(job);
-
-            for (Task task : tasks) {
-                final FileProcessorActor.Command command = new FileProcessorActor.Command(task.getId(), task.getType(), fs.getContent(), fs.getFilename(), fs.getExtension());
-                queue.add(command);
-            }
-        });
-
+        service.completeJob(cmd.jobId, queue);
         self().tell(new ScheduleNext(), self());
     }
 
@@ -114,11 +96,8 @@ public class FileDispatcherActor extends BaseActor {
     }
 
     // PROPS
-    public static Props props(final JobService jobService,
-                              final TaskService taskService,
-                              final TaskExecutor executor,
-                              final int parallelism) {
-        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(jobService, taskService, executor, parallelism));
+    public static Props props(final TaskService taskService, final TaskExecutor executor, final FileDispatcherService service, final int parallelism) {
+        return Props.create(FileDispatcherActor.class, () -> new FileDispatcherActor(taskService, executor, service, parallelism));
     }
 
     @Data

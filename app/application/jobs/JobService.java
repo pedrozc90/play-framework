@@ -15,6 +15,10 @@ public class JobService {
     private JobRepository repository;
 
     // QUERY
+    public Job get(final EntityManager em, final Long id) {
+        return repository.findById(em, id);
+    }
+
     public Job get(final Long id) {
         return repository.findById(id);
     }

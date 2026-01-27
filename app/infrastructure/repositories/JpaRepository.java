@@ -1,7 +1,6 @@
 package infrastructure.repositories;
 
 import play.Logger;
-import play.db.jpa.JPA;
 import play.db.jpa.JPAApi;
 
 import javax.persistence.EntityManager;
@@ -19,8 +18,7 @@ public abstract class JpaRepository<T, ID> {
     }
 
     public EntityManager em() {
-        // return jpaApi.em("default"); // not working, it creates a new EntityManager on every call.
-        return JPA.em();                // I was supposed to remove this, but it works... (-_-")
+        return jpa.em();
     }
 
     public T findById(final EntityManager em, final ID id) {
