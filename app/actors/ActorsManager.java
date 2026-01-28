@@ -2,11 +2,11 @@ package actors;
 
 import actors.files.FileDispatcherActor;
 import akka.actor.ActorRef;
-import com.google.inject.name.Named;
 import domain.jobs.Job;
 import play.Logger;
 
 import javax.inject.Inject;
+import javax.inject.Named;
 import javax.inject.Singleton;
 
 @Singleton

@@ -16,7 +16,6 @@ import core.utils.http.HttpStatus;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.UnsupportedEncodingException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Date;
@@ -39,23 +38,19 @@ public class TokenService {
 
     @Inject
     public TokenService(final Configuration config) {
-        try {
-            issuer = config.getJwtIssuer();
-            secret = config.getJwtSecret();
+        issuer = config.getJwtIssuer();
+        secret = config.getJwtSecret();
 
-            final Duration duration = config.getJwtExpiration();
-            expiration = (duration != null)
-                ? duration.getSeconds()
-                : 0;
+        final Duration duration = config.getJwtExpiration();
+        expiration = (duration != null)
+            ? duration.getSeconds()
+            : 0;
 
-            algorithm = Algorithm.HMAC256(secret);
+        algorithm = Algorithm.HMAC256(secret);
 
-            verifier = JWT.require(algorithm)
-                .withIssuer(issuer)
-                .build();
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException("Failed to initialize jet algorithm", e);
-        }
+        verifier = JWT.require(algorithm)
+            .withIssuer(issuer)
+            .build();
     }
 
     /**

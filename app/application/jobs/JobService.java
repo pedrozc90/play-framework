@@ -2,7 +2,7 @@ package application.jobs;
 
 import domain.files.FileStorage;
 import domain.jobs.Job;
-import infrastructure.repositories.JobRepository;
+import infrastructure.repositories.jobs.JobRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,14 +17,6 @@ public class JobService {
     // QUERY
     public Job get(final EntityManager em, final Long id) {
         return repository.findById(em, id);
-    }
-
-    public Job get(final Long id) {
-        return repository.findById(id);
-    }
-
-    public Job getByFile(final FileStorage file) {
-        return repository.get(file);
     }
 
     // METHODS

@@ -1,61 +1,25 @@
 package infrastructure.repositories;
 
-import play.Logger;
-import play.db.jpa.JPAApi;
-
 import javax.persistence.EntityManager;
+import java.util.concurrent.CompletionStage;
+import java.util.function.Function;
 
-public abstract class JpaRepository<T, ID> {
+public interface JpaRepository<T> {
 
-    protected final Logger.ALogger logger;
-    protected final JPAApi jpa;
-    protected final Class<T> clazz;
+    <R> R wrap(final Function<EntityManager, R> function);
 
-    public JpaRepository(final JPAApi jpa, final Class<T> clazz) {
-        this.logger = Logger.of(getClass());
-        this.jpa = jpa;
-        this.clazz = clazz;
-    }
+    T persist(final EntityManager em, final T entity);
 
-    public EntityManager em() {
-        return jpa.em();
-    }
+    CompletionStage<T> persist(final T entity);
 
-    public T findById(final EntityManager em, final ID id) {
-        return em.find(clazz, id);
-    }
+    T merge(final EntityManager em, final T entity);
 
-    public T findById(final ID id) {
-        return findById(em(), id);
-    }
+    CompletionStage<T> merge(final T entity);
 
-    public T persist(final EntityManager em, final T entity) {
-        em.persist(entity);
-        return entity;
-    }
+    T remove(final EntityManager em, final T entity);
 
-    public T persist(final T entity) {
-        return persist(em(), entity);
-    }
+    CompletionStage<T> remove(final T entity);
 
-    public T merge(final T entity) {
-        return em().merge(entity);
-    }
-
-    public void remove(final EntityManager em, final T entity) {
-        em.remove(entity);
-    }
-
-    public void remove(final T entity) {
-        remove(em(), entity);
-    }
-
-    public void flush(final EntityManager em) {
-        em.flush();
-    }
-
-    public void flush() {
-        flush(em());
-    }
+    void flush(final EntityManager em);
 
 }

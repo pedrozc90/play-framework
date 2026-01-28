@@ -6,7 +6,6 @@ import application.auth.objects.JwtEncoded;
 import application.users.UserService;
 import config.Configuration;
 import core.exceptions.AppException;
-import domain.users.User;
 import play.mvc.Http;
 import web.controllers.auth.objects.LoginResponse;
 import web.security.objects.UserContext;
@@ -16,6 +15,7 @@ import javax.inject.Singleton;
 import java.time.Duration;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class AuthenticationService {
@@ -48,13 +48,14 @@ public class AuthenticationService {
         );
     }
 
-    public LoginResponse authenticate(final String email, final String password) throws AppException {
-        final User user = userService.get(email, password);
-        final Set<String> roles = new HashSet<>();
-        final Set<String> permissions = new HashSet<>();
-        final JwtClaims claims = new JwtClaims(user.getEmail(), user.getId(), roles, permissions);
-        final JwtEncoded result = tokenService.encode(claims);
-        return new LoginResponse(result.getToken(), result.getIssuedAt(), result.getExpiresAt());
+    public CompletionStage<LoginResponse> authenticate(final String email, final String password) throws AppException {
+        return userService.get(email, password).thenApply((user) -> {
+            final Set<String> roles = new HashSet<>();
+            final Set<String> permissions = new HashSet<>();
+            final JwtClaims claims = new JwtClaims(user.getEmail(), user.getId(), roles, permissions);
+            final JwtEncoded result = tokenService.encode(claims);
+            return new LoginResponse(result.getToken(), result.getIssuedAt(), result.getExpiresAt());
+        });
     }
 
     /* --- Cookies ---*/
@@ -77,7 +78,7 @@ public class AuthenticationService {
 
         final Duration maxAge = config.getCookiesMaxAge();
         if (maxAge != null && maxAge.getSeconds() > 0) {
-            builder.withMaxAge((int) maxAge.getSeconds());
+            builder.withMaxAge(maxAge);
         }
 
         return builder.build();

@@ -1,7 +1,9 @@
 package web.security.objects;
 
+import play.libs.typedmap.TypedKey;
+
 public class Attrs {
 
-    public static final String USER_CONTEXT = "context";
+    public static final TypedKey<UserContext> USER_CONTEXT = TypedKey.create("context");
 
 }

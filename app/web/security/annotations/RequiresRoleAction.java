@@ -14,12 +14,11 @@ import java.util.concurrent.CompletionStage;
 public class RequiresRoleAction extends Action<RequiresRole> {
 
     @Override
-    public CompletionStage<Result> call(final Http.Context ctx) {
-        final Http.Request req = ctx.request();
-        final String method = req.method();
-        final String path = req.path();
+    public CompletionStage<Result> call(final Http.Request request) {
+        final String method = request.method();
+        final String path = request.path();
 
-        final UserContext context = (UserContext) ctx.args.get(Attrs.USER_CONTEXT);
+        final UserContext context = request.attrs().get(Attrs.USER_CONTEXT);
         if (context == null) {
             return CompletableFuture.completedFuture(ResultBuilder.of("Authentication required").unauthorized());
         }
@@ -35,7 +34,7 @@ public class RequiresRoleAction extends Action<RequiresRole> {
             );
         }
 
-        return delegate.call(ctx);
+        return delegate.call(request);
     }
 
 }

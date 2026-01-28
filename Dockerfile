@@ -6,7 +6,7 @@
 FROM eclipse-temurin:8-jdk AS builder
 
 # sbt version compatible with Play Framework 2.3
-ENV SBT_VERSION=0.13.18
+ENV SBT_VERSION=1.2.8
 
 # install minimal tools and sbt from official Scala SBT repository
 RUN apt-get update && \

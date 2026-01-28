@@ -5,6 +5,8 @@ import web.controllers.health.objects.HealthDto;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class HealthService {
@@ -12,12 +14,12 @@ public class HealthService {
     @Inject
     private Configuration config;
 
-    public HealthDto create() {
-        return new HealthDto(
+    public CompletionStage<HealthDto> create() {
+        return CompletableFuture.supplyAsync(() -> new HealthDto(
             config.name(),
             config.version(),
             config.mode()
-        );
+        ));
     }
 
 }

@@ -4,10 +4,10 @@ import application.health.HealthService;
 import core.play.utils.ResultBuilder;
 import play.mvc.Controller;
 import play.mvc.Result;
-import web.controllers.health.objects.HealthDto;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.concurrent.CompletionStage;
 
 @Singleton
 public class HealthController extends Controller {
@@ -19,9 +19,8 @@ public class HealthController extends Controller {
         this.service = service;
     }
 
-    public Result health() {
-        final HealthDto dto = service.create();
-        return ResultBuilder.of(dto).ok();
+    public CompletionStage<Result> health() {
+        return service.create().thenApply((dto) -> ResultBuilder.of(dto).ok());
     }
 
 }

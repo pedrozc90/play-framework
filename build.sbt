@@ -1,4 +1,4 @@
-lazy val scala2 = "2.11.12"
+lazy val scala2 = "2.12.10"
 
 lazy val root = (project in file("."))
     .enablePlugins(PlayJava)
@@ -24,34 +24,26 @@ lazy val root = (project in file("."))
             evolutions,
 
             // Database
-            "org.postgresql" % "postgresql" % "42.6.0",
+            "org.postgresql" % "postgresql" % "42.7.9",
 
             // Hibernate
             "org.hibernate" % "hibernate-core" % "5.3.20.Final",
             "org.hibernate" % "hibernate-entitymanager" % "5.3.20.Final",
-            "org.hibernate" % "hibernate-validator" % "5.4.3.Final",
-
-            // Java Standard API
-            "org.hibernate.javax.persistence" % "hibernate-jpa-2.1-api" % "1.0.2",
-
-            // Jackson
-            "com.fasterxml.jackson.datatype" % "jackson-datatype-jdk8" % "2.8.11",
 
             // Validation
-            "javax.el" % "el-api" % "2.2",
-            "org.glassfish.web" % "el-impl" % "2.2",
+            "org.glassfish" % "javax.el" % "3.0.1-b12",
 
             // JWT
-            "com.auth0" % "java-jwt" % "3.2.0",
+            "com.auth0" % "java-jwt" % "3.8.2",
 
             // Query debugging
-            "p6spy" % "p6spy" % "3.8.7",
+            "p6spy" % "p6spy" % "3.9.1",
 
             // Lombok
             "org.projectlombok" % "lombok" % "1.18.32" % "provided",
 
             // Testing
             "junit" % "junit" % "4.13.2" % Test,
-            "com.typesafe.play" %% "play-test" % "2.6.25" % Test
+            "com.typesafe.play" %% "play-test" % "2.7.9" % Test
         )
     )
