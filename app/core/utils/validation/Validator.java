@@ -7,8 +7,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.validation.ConstraintViolation;
 import javax.validation.ConstraintViolationException;
-import javax.validation.Validation;
-import javax.validation.ValidatorFactory;
 import java.util.Set;
 
 @Singleton
@@ -18,10 +16,12 @@ public class Validator {
     private final javax.validation.Validator _validator;
 
     @Inject
-    public Validator(final ExceptionMapper mapper) {
+    public Validator(
+        final ExceptionMapper mapper,
+        final javax.validation.Validator validator
+    ) {
         this.mapper = mapper;
-        final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        _validator = factory.getValidator();
+        this._validator = validator;
     }
 
     public <T> void validate(final T obj) throws AppException {

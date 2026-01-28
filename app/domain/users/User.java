@@ -4,6 +4,7 @@ import domain.audit.AuditEntity;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
@@ -35,6 +36,7 @@ public class User extends AuditEntity implements Serializable {
     @Column(name = "password", length = 32, nullable = false)
     private String password;
 
+    @ColumnDefault("true")
     @Column(name = "active", nullable = false)
     private boolean active = true;
 

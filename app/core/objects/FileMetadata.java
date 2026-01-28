@@ -5,6 +5,7 @@ import core.utils.FileUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import play.libs.Files.TemporaryFile;
 import play.mvc.Http;
 
 import java.io.File;
@@ -25,8 +26,8 @@ public class FileMetadata {
         return new FileMetadata(filename, bytes, contentType);
     }
 
-    public static FileMetadata of(final Http.MultipartFormData.FilePart<File> part) throws AppException {
-        final File file = part.getFile();
+    public static FileMetadata of(final Http.MultipartFormData.FilePart<TemporaryFile> part) throws AppException {
+        final File file = part.getRef().path().toFile();
         final String filename = part.getFilename();
         final String contentType = part.getContentType();
 

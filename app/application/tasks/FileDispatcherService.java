@@ -40,7 +40,7 @@ public class FileDispatcherService {
 
             final FileStorage fs = job.getFile();
 
-            final List<Task> tasks = taskService.generateAll(job);
+            final List<Task> tasks = taskService.generateAll(em, job);
 
             for (Task task : tasks) {
                 final FileProcessorActor.Command command = new FileProcessorActor.Command(task.getId(), task.getType(), fs.getContent(), fs.getFilename(), fs.getExtension());

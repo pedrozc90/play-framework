@@ -12,6 +12,7 @@ import web.security.objects.Attrs;
 import web.security.objects.UserContext;
 
 import javax.inject.Inject;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionStage;
 
@@ -27,10 +28,9 @@ public class AuthenticationAction extends Action<Authenticated> {
     }
 
     @Override
-    public CompletionStage<Result> call(final Http.Context ctx) {
-        final Http.Request req = ctx.request();
+    public CompletionStage<Result> call(final Http.Request request) {
         try {
-            final String accessToken = extractAccessToken(req, configuration.values());
+            final String accessToken = extractAccessToken(request, configuration.values());
             if (accessToken == null) {
                 return CompletableFuture.completedFuture(ResultBuilder.of("Token is missing").unauthorized());
             }
@@ -38,14 +38,14 @@ public class AuthenticationAction extends Action<Authenticated> {
             final UserContext context = service.validate(accessToken);
 
             // add user to request attributes (Not ThreadLocal)
-            ctx.args.put(Attrs.USER_CONTEXT, context);
+            request.attrs().put(Attrs.USER_CONTEXT, context);
 
-            return delegate.call(ctx);
+            return delegate.call(request);
         } catch (AppException e) {
             throw e.toCompletionException();
         } finally {
             // clear context
-            ctx.args.remove(Attrs.USER_CONTEXT);
+            request.attrs().remove(Attrs.USER_CONTEXT);
         }
     }
 
@@ -70,21 +70,22 @@ public class AuthenticationAction extends Action<Authenticated> {
     }
 
     /* --- Headers --- */
-    private String getHeader(final Http.Request req, final String name) {
-        return req.getHeader(name);
+    private Optional<String> getHeader(final Http.Request req, final String name) {
+        return req.getHeaders().get(name);
     }
 
-    private String getAuthorization(final Http.Request req) {
+    private Optional<String> getAuthorization(final Http.Request req) {
         return getHeader(req, HttpHeaders.AUTHORIZATION);
     }
 
     protected String extractBearer(final Http.Request request) {
-        final String authorization = getAuthorization(request);
-        if (authorization == null || authorization.isEmpty()) {
+        final Optional<String> optAuthorization = getAuthorization(request);
+        if (!optAuthorization.isPresent()) {
             logger.trace("Authorization header is missing");
             return null;
         }
 
+        final String authorization = optAuthorization.get();
         if (authorization.startsWith("Bearer ")) {
             return authorization.substring("Bearer ".length()).trim();
         } else {

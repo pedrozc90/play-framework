@@ -5,6 +5,7 @@ import core.objects.ResultMessage;
 import core.utils.http.HttpStatus;
 import core.utils.validation.Violation;
 import play.libs.Json;
+import play.mvc.Http;
 import play.mvc.Result;
 import play.mvc.Results;
 
@@ -67,6 +68,8 @@ public class ResultBuilder {
 
         TerminalStatus status(final HttpStatus status);
 
+        AfterMessage cookie(final Http.Cookie cookie);
+
         Result ok();
 
         Result created();
@@ -117,6 +120,7 @@ public class ResultBuilder {
         private Integer status;
         private Object content;
         private String message;
+        private Http.Cookie cookie;
         private List<Violation> violations;
 
         /* ----- content ----- */
@@ -127,6 +131,13 @@ public class ResultBuilder {
             return this;
         }
 
+        /* ----- cookie ----- */
+
+        @Override
+        public AfterMessage cookie(final Http.Cookie cookie) {
+            this.cookie = cookie;
+            return this;
+        }
         /* ----- message ----- */
 
         @Override
@@ -209,18 +220,25 @@ public class ResultBuilder {
 
         /* ----- terminal ----- */
 
-        @Override
-        public Result toResult() {
-            final int _status = (status != null) ? status : 200;
-            if (_status == 204) {
+        public Result toResult(final int status) {
+            if (status == 204) {
                 return Results.status(204);
             }
 
             final JsonNode json = buildBody();
             if (json == null) {
-                return Results.status(_status);
+                return Results.status(status);
             }
-            return Results.status(_status, json);
+            return Results.status(status, json);
+        }
+
+        @Override
+        public Result toResult() {
+            final Result result = toResult((status != null) ? status : 200);
+            if (cookie != null) {
+                result.withCookies(cookie);
+            }
+            return result;
         }
 
         private JsonNode buildBody() {

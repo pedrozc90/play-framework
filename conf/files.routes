@@ -2,4 +2,4 @@
 # Prefix: /api/files
 
 GET         /        @web.controllers.files.FileController.fetch(page: Int ?= 1, rows: Int ?= 15, q: String ?= null)
-POST        /        @web.controllers.files.FileController.upload()
+POST        /        @web.controllers.files.FileController.upload(req: Request)

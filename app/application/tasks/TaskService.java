@@ -8,7 +8,7 @@ import domain.jobs.Job;
 import domain.tasks.Task;
 import domain.tasks.TaskStatus;
 import domain.tasks.TaskType;
-import infrastructure.repositories.TaskRepository;
+import infrastructure.repositories.tasks.TaskRepository;
 import play.db.jpa.JPAApi;
 
 import javax.inject.Inject;
@@ -38,23 +38,23 @@ public class TaskService {
     }
 
     // QUERY
-    public Task get(final Long id) {
-        return repository.findById(id);
+    public Task get(final EntityManager em, final Long id) {
+        return repository.findById(em, id);
     }
 
     // METHOD
-    public Task create(final TaskType type, final Job job) {
-        return create(type, TaskStatus.NEW, null, null, job);
+    public Task create(final EntityManager em, final TaskType type, final Job job) {
+        return create(em, type, TaskStatus.NEW, null, null, job);
     }
 
-    public Task create(final TaskType type, final TaskStatus status, final Timestamp startedAt, final Timestamp completedAt, final Job job) {
+    public Task create(final EntityManager em, final TaskType type, final TaskStatus status, final Timestamp startedAt, final Timestamp completedAt, final Job job) {
         final Task obj = new Task();
         obj.setType(type);
         obj.setStatus(status);
         obj.setStartedAt(startedAt);
         obj.setCompletedAt(completedAt);
         obj.setJob(job);
-        return repository.persist(obj);
+        return repository.persist(em, obj);
     }
 
     public void update(final EntityManager em, final Long id, final TaskStatus status) {
@@ -64,14 +64,14 @@ public class TaskService {
         // repository.persist(task);
     }
 
-    public List<Task> generateAll(final Job job) {
+    public List<Task> generateAll(final EntityManager em, final Job job) {
         final FileStorage fs = job.getFile();
         final String extension = fs.getExtension();
 
         // return Arrays.stream(TaskType.values())
         return Stream.of(TaskType.RESIZE_TEST)
             .filter(type -> generateFilter(type, extension))
-            .map((type) -> create(type, job))
+            .map((type) -> create(em, type, job))
             .collect(Collectors.toList());
     }
 
@@ -90,7 +90,7 @@ public class TaskService {
         return jpa.withTransaction((em) -> {
             this.update(em, taskId, status);
             if (result != null) {
-                return fsService.create(result.getFilename(), result.getBytes());
+                return fsService.create(em, result.getFilename(), result.getBytes());
             }
             return null;
         });
