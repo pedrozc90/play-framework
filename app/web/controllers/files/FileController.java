@@ -26,7 +26,7 @@ public class FileController extends Controller {
     private static final FileStorageService fsService = FileStorageService.getInstance();
     private static final JobService jobService = JobService.getInstance();
     private static final ActorsManager actorsManager = ActorsManager.getInstance();
-    private static final FileStorageMapper mapper = FileStorageMapper.getInstance();
+    private static final FileStorageMapper mapper = FileStorageMapper.INSTANCE;
 
     public static Result fetch(final int page, final int rows, final String q) throws AppException {
         final Page<FileStorage> result = fsService.fetch(page, rows, q);

@@ -20,7 +20,7 @@ import web.security.annotations.Authenticated;
 public class UserController extends Controller {
 
     private static final UserService userService = UserService.getInstance();
-    private static final UserMapper mapper = UserMapper.getInstance();
+    private static final UserMapper mapper = UserMapper.INSTANCE;
     private static final Validator validator = Validator.getInstance();
 
     // @Authenticated

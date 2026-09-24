@@ -9,6 +9,7 @@ lazy val root = (project in file("."))
         organization := "com.pedrozc90.play",
         version := "1.0.0",
         scalaVersion := scala2,
+        javacOptions ++= Seq("-parameters"),
         resolvers ++= Seq(
             "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
             "Central Repository" at "https://repo1.maven.org/maven2/",
@@ -46,6 +47,11 @@ lazy val root = (project in file("."))
 
             // Lombok
             "org.projectlombok" % "lombok" % "1.16.20" % "provided",
+
+            // MapStruct
+            "org.mapstruct" % "mapstruct" % "1.5.5.Final",
+            "org.mapstruct" % "mapstruct-processor" % "1.5.5.Final" % "provided",
+            "org.projectlombok" % "lombok-mapstruct-binding" % "0.2.0" % "provided",
 
             // Testing
             "junit" % "junit" % "4.12" % Test,

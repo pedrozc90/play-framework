@@ -1,62 +1,23 @@
 package web.mappers;
 
 import core.utils.DateUtils;
-import domain.files.FileStorage;
+import core.utils.UuidUtils;
 import domain.jobs.Job;
-import web.dtos.FileStorageDto;
+import org.mapstruct.Mapper;
+import org.mapstruct.MappingTarget;
+import org.mapstruct.factory.Mappers;
 import web.dtos.JobDto;
 
-import java.time.Instant;
-import java.util.UUID;
+@Mapper(uses = { DateUtils.class, UuidUtils.class, FileStorageMapper.class })
+public interface JobMapper {
 
-public class JobMapper implements EntityMapper<Job, JobDto> {
+    JobMapper INSTANCE = Mappers.getMapper(JobMapper.class);
 
-    private final FileStorageMapper fileStorageMapper = FileStorageMapper.getInstance();
+    JobDto toDto(final Job entity);
 
-    private static JobMapper instance;
+    Job toEntity(@MappingTarget final Job entity, final JobDto dto);
 
-    public static JobMapper getInstance() {
-        if (instance == null) {
-            instance = new JobMapper();
-        }
-        return instance;
-    }
-
-    @Override
-    public JobDto toDto(final Job entity) {
-        if (entity == null) return null;
-        final UUID uuid = UUID.fromString(entity.getUuid());
-        final Instant insertedAt = DateUtils.toInstant(entity.getInsertedAt());
-        final Instant updatedAt = DateUtils.toInstant(entity.getUpdatedAt());
-        final FileStorageDto file = fileStorageMapper.toDto(entity.getFile());
-        return new JobDto(
-            uuid,
-            insertedAt,
-            updatedAt,
-            entity.getVersion(),
-            entity.getId(),
-            entity.getStatus(),
-            file
-        );
-    }
-
-    @Override
-    public Job toEntity(final Job entity, final JobDto dto) {
-        entity.setId(dto.getId());
-        entity.setUuid(dto.getUuid().toString());
-        entity.setInsertedAt(DateUtils.toTimestamp(dto.getInsertedAt()));
-        entity.setUpdatedAt(DateUtils.toTimestamp(dto.getUpdatedAt()));
-        entity.setVersion(dto.getVersion());
-        entity.setStatus(dto.getStatus());
-
-        final FileStorage file = fileStorageMapper.toEntity(dto.getFile());
-        entity.setFile(file);
-
-        return entity;
-    }
-
-    @Override
-    public Job toEntity(final JobDto dto) {
+    default Job toEntity(final JobDto dto) {
         return toEntity(new Job(), dto);
     }
 
