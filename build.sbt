@@ -9,7 +9,11 @@ lazy val root = (project in file("."))
         organization := "com.pedrozc90.play",
         version := "1.0.0",
         scalaVersion := scala2,
-        javacOptions ++= Seq("-parameters"),
+        javacOptions ++= Seq("-parameters", "-s", (sourceManaged in Compile).value.getAbsolutePath),
+        sourceGenerators in Compile += Def.task {
+            IO.createDirectory((sourceManaged in Compile).value)
+            Seq.empty[File]
+        }.taskValue,
         resolvers ++= Seq(
             "Typesafe repository" at "https://repo.typesafe.com/typesafe/releases/",
             "Central Repository" at "https://repo1.maven.org/maven2/",
@@ -52,6 +56,11 @@ lazy val root = (project in file("."))
             "org.mapstruct" % "mapstruct" % "1.5.5.Final",
             "org.mapstruct" % "mapstruct-processor" % "1.5.5.Final" % "provided",
             "org.projectlombok" % "lombok-mapstruct-binding" % "0.2.0" % "provided",
+
+            // QueryDSL
+            "com.querydsl" % "querydsl-jpa" % "4.1.4",
+            "com.querydsl" % "querydsl-apt" % "4.1.4" % "provided" classifier "jpa",
+            "javax.inject" % "javax.inject" % "1",
 
             // Testing
             "junit" % "junit" % "4.12" % Test,

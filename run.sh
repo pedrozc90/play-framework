@@ -86,13 +86,15 @@ fi
 # Always compile
 compile
 
-# Prepare Java options
+# Prepare sbt JVM options
+# Note: the ./sbt launcher (sbt-extras) ignores JAVA_OPTS; -D flags must be passed as CLI args.
+SBT_JVM_ARGS=()
 if [ "$AUTO_APPLY_EVOLUTIONS" = true ]; then
-    export JAVA_OPTS="-Dplay.evolutions.db.default.autoApply=true"
+    SBT_JVM_ARGS+=("-DapplyEvolutions.default=true")
 fi
 
 # Run the application
 echo -e "${GREEN}Running application...${NC}"
-echo -e "${YELLOW}Java opts: $JAVA_OPTS${NC}"
+echo -e "${YELLOW}sbt JVM args: ${SBT_JVM_ARGS[*]}${NC}"
 
-$SBT_COMMAND -jvm-debug 9999 run
+$SBT_COMMAND "${SBT_JVM_ARGS[@]}" -jvm-debug 9999 run

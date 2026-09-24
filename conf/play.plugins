@@ -1,0 +1,10 @@
+# Play merges every play.plugins file found on the classpath (library jars + this one) into
+# one priority-sorted list, with no dedup by class name (see play.api.Application#pluginClasses).
+#
+# The bundled priorities are 200:BoneCPPlugin, 400:JPAPlugin, 500:EvolutionsPlugin, so JPA's
+# hibernate.hbm2ddl.auto=validate check always runs before evolutions get a chance to apply the
+# schema. Registering EvolutionsPlugin again here, between the DB pool and JPA, makes it apply
+# pending evolutions before JPA validates. The later 500:EvolutionsPlugin instance from the
+# library jar still runs too, but EvolutionsPlugin#onStart() is idempotent (no-op once nothing
+# is pending), so running it twice is harmless.
+300:play.api.db.evolutions.EvolutionsPlugin

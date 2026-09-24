@@ -1,8 +1,9 @@
 package infrastructure.repositories;
 
+import domain.tasks.QTask;
 import domain.tasks.Task;
 
-public class TaskRepository extends JpaRepository<Task, Long> {
+public class TaskRepository extends JpaRepository<Task, QTask, Long> {
 
     private static TaskRepository instance;
 
@@ -14,7 +15,7 @@ public class TaskRepository extends JpaRepository<Task, Long> {
     }
 
     public TaskRepository() {
-        super(Task.class);
+        super(Task.class, QTask.task);
     }
 
 }

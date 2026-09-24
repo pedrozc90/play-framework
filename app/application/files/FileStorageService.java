@@ -8,7 +8,6 @@ import infrastructure.repositories.FileStorageRepository;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.UUID;
 
 public class FileStorageService {
@@ -55,8 +54,7 @@ public class FileStorageService {
 
     // ENDPOINTS
     public Page<FileStorage> fetch(final int page, final int rows, final String q) {
-        final List<FileStorage> results = repository.fetch(page, rows, q);
-        return new Page<>(page, rows, 0, results);
+        return repository.fetch(page, rows, q);
     }
 
 }

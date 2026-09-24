@@ -1,13 +1,13 @@
 package infrastructure.repositories;
 
+import com.querydsl.jpa.impl.JPAQuery;
+import core.objects.Page;
 import domain.files.FileStorage;
+import domain.files.QFileStorage;
 
-import javax.persistence.NoResultException;
-import javax.persistence.Query;
-import java.util.List;
 import java.util.UUID;
 
-public class FileStorageRepository extends JpaRepository<FileStorage, Long> {
+public class FileStorageRepository extends JpaRepository<FileStorage, QFileStorage, Long> {
 
     private static FileStorageRepository instance;
 
@@ -19,34 +19,26 @@ public class FileStorageRepository extends JpaRepository<FileStorage, Long> {
     }
 
     public FileStorageRepository() {
-        super(FileStorage.class);
+        super(FileStorage.class, QFileStorage.fileStorage);
     }
 
     public FileStorage get(final UUID uuid) {
-        try {
-            return em().createQuery("SELECT fs FROM FileStorage fs WHERE fs.uuid = :uuid", FileStorage.class)
-                .setParameter("uuid", uuid)
-                .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        if (uuid == null) return null;
+        return createQuery()
+            .where(entity.uuid.eq(uuid.toString()))
+            .fetchOne();
     }
 
-    public List<FileStorage> fetch(final int page, final int rows, final String q) {
-        String text = "SELECT fs FROM FileStorage fs";
-        if (q != null) {
-            text += " WHERE fs.filename LIKE :q";
-        }
-        text += " LIMIT :limit OFFSET :offset";
+    public Page<FileStorage> fetch(final int page, final int rows, final String q) {
+        final JPAQuery<FileStorage> query = createQuery();
 
-        Query query = em().createQuery(text);
         if (q != null) {
-            query.setParameter("q", "%" + q + "%");
+            query.where(entity.filename.contains(q));
         }
 
-        return query.setParameter("limit", rows)
-            .setParameter("offset", (page - 1) * rows)
-            .getResultList();
+        query.orderBy(entity.filename.asc());
+
+        return fetch(query, page, rows);
     }
 
 }

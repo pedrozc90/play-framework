@@ -2,10 +2,9 @@ package infrastructure.repositories;
 
 import domain.files.FileStorage;
 import domain.jobs.Job;
+import domain.jobs.QJob;
 
-import javax.persistence.NoResultException;
-
-public class JobRepository extends JpaRepository<Job, Long> {
+public class JobRepository extends JpaRepository<Job, QJob, Long> {
 
     private static JobRepository instance;
 
@@ -17,17 +16,14 @@ public class JobRepository extends JpaRepository<Job, Long> {
     }
 
     public JobRepository() {
-        super(Job.class);
+        super(Job.class, QJob.job);
     }
 
     public Job get(final FileStorage file) {
-        try {
-            return em().createQuery("SELECT j FROM Job j WHERE j.file.id = :file_id", Job.class)
-                .setParameter("file_id", file.getId())
-                .getSingleResult();
-        } catch (NoResultException e) {
-            return null;
-        }
+        if (file == null) return null;
+        return createQuery()
+            .where(entity.file.eq(file))
+            .fetchOne();
     }
 
 }
