@@ -11,6 +11,7 @@ import domain.files.FileStorage;
 import domain.jobs.Job;
 import play.Logger;
 import play.db.jpa.JPA;
+import play.db.jpa.Transactional;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
@@ -28,6 +29,7 @@ public class FileController extends Controller {
     private static final ActorsManager actorsManager = ActorsManager.getInstance();
     private static final FileStorageMapper mapper = FileStorageMapper.INSTANCE;
 
+    @Transactional
     public static Result fetch(final int page, final int rows, final String q) throws AppException {
         final Page<FileStorage> result = fsService.fetch(page, rows, q);
         final Page<FileStorageDto> resultDto = result.map(mapper::toDto);
@@ -57,6 +59,8 @@ public class FileController extends Controller {
             actorsManager.queue(j);
 
             return ResultBuilder.of("File successfully uploaded.").ok();
+        } catch (Error e) {
+            throw e;
         } catch (Throwable e) {
             throw AppException.of(e, "Upload failed.");
         }

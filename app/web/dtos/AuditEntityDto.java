@@ -9,7 +9,6 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.ToString;
 
-import javax.persistence.MappedSuperclass;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
@@ -17,7 +16,6 @@ import java.util.UUID;
 @Getter
 @EqualsAndHashCode
 @ToString
-@MappedSuperclass
 public abstract class AuditEntityDto implements Serializable {
 
     @JsonProperty(value = "uuid")

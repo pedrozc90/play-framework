@@ -53,6 +53,8 @@ COPY --from=builder /app/target/universal/stage .
 
 # Play default HTTP port
 EXPOSE 9000
-ENV PLAY_HTTP_SECRET_KEY=changeme
 
-CMD ["bin/play-boilerplate", "-Dhttp.port=9000"]
+# PLAY_SECRET, PLAY_JWT_SECRET and PLAY_DB_PASS must be supplied at container run time
+# (e.g. `docker run -e PLAY_SECRET=... -e PLAY_JWT_SECRET=... -e PLAY_DB_PASS=...` or
+# compose `environment:`) — production.conf fails fast at startup if they are missing.
+CMD ["bin/play-boilerplate", "-Dhttp.port=9000", "-Dconfig.resource=production.conf"]

@@ -58,6 +58,10 @@ public class Configuration {
         return getAsString("application.jwt.issuer");
     }
 
+    public String getCorsAllowedOrigins() {
+        return getAsString("cors.allowed.origins");
+    }
+
     public Duration getJwtExpiration() {
         try {
             final String value = getAsString("application.jwt.expiration");
@@ -70,14 +74,6 @@ public class Configuration {
     // HELPERS
     private String getAsString(final String key) {
         return application.configuration().getString(key);
-    }
-
-    private Integer getAsInteger(final String key) {
-        return application.configuration().getInt(key);
-    }
-
-    private boolean getAsBoolean(final String key) {
-        return application.configuration().getBoolean(key) == Boolean.TRUE;
     }
 
 }

@@ -15,7 +15,7 @@ import java.io.Serializable;
 @Entity
 @Table(
     name = "jobs",
-    uniqueConstraints = @UniqueConstraint(name = "jobs_uuid_key", columnNames = "uuid")
+    uniqueConstraints = @UniqueConstraint(name = "jobs_uuid_ukey", columnNames = "uuid")
 )
 public class Job extends AuditEntity implements Serializable {
 

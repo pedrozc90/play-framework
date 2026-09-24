@@ -1,6 +1,7 @@
 package application.tasks;
 
-
+import core.exceptions.AppException;
+import core.utils.http.HttpStatus;
 import domain.files.FileStorage;
 import domain.jobs.Job;
 import domain.tasks.Task;
@@ -46,11 +47,12 @@ public class TaskService {
         return repository.persist(obj);
     }
 
-    public void update(final Long id, final TaskStatus status) {
+    public void update(final Long id, final TaskStatus status) throws AppException {
         final Task task = repository.findById(id);
+        if (task == null) {
+            throw AppException.of(HttpStatus.NOT_FOUND, "Task (%d) not found", id);
+        }
         task.setStatus(status);
-        // TODO: do we need to persist ???
-        // repository.persist(task);
     }
 
     public List<Task> generateAll(final Job job) {

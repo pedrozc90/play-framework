@@ -46,7 +46,7 @@ public class UserController extends Controller {
     public static Result get(final Long id) throws AppException {
         final User user = userService.get(id);
         final UserDto dto = mapper.toDto(user);
-        return ResultBuilder.of(dto).created();
+        return ResultBuilder.of(dto).ok();
     }
 
     @Authenticated

@@ -1,5 +1,6 @@
 package core.play.filters;
 
+import config.Configuration;
 import core.play.utils.ScalaUtils;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,15 +16,23 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class CorsFilter extends PlayFilter {
 
-    // Optional: restrict allowed origins
-    private static final Set<String> ALLOWED_ORIGINS = new HashSet<>(Arrays.asList(
-        "http://localhost:4200",
-        "http://127.0.0.1:4200"
-        // add prod domains here
-    ));
+    private static final String DEFAULT_ALLOWED_ORIGINS = "http://localhost:4200,http://127.0.0.1:4200";
+
+    // Configurable via `cors.allowed.origins` (comma-separated), defaulting to the dev origins above
+    private static final Set<String> ALLOWED_ORIGINS = resolveAllowedOrigins();
+
+    private static Set<String> resolveAllowedOrigins() {
+        final String configured = Configuration.getInstance().getCorsAllowedOrigins();
+        final String value = (configured != null && !configured.isEmpty()) ? configured : DEFAULT_ALLOWED_ORIGINS;
+        return Arrays.stream(value.split(","))
+            .map(String::trim)
+            .filter(origin -> !origin.isEmpty())
+            .collect(Collectors.toCollection(HashSet::new));
+    }
 
     @Override
     public Future<Result> apply(final Function1<RequestHeader, Future<Result>> next, final RequestHeader req) {

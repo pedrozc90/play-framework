@@ -40,7 +40,7 @@ public class UserService {
         final String hashed = HashUtils.md5(password);
         final User user = repository.get(email, hashed);
         if (user == null) {
-            throw AppException.of(HttpStatus.NOT_FOUND, "User not found");
+            throw AppException.of(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
         return user;
     }
@@ -65,8 +65,9 @@ public class UserService {
             user.setEmail(cmd.getEmail());
         }
 
-        if (!Objects.equals(user.getPassword(), cmd.getPassword())) {
-            user.setPassword(cmd.getPassword());
+        final String hashed = HashUtils.md5(cmd.getPassword());
+        if (!Objects.equals(user.getPassword(), hashed)) {
+            user.setPassword(hashed);
         }
 
         if (!Objects.equals(user.isActive(), cmd.isActive())) {

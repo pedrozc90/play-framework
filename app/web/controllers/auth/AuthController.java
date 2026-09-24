@@ -9,6 +9,9 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
+
+import java.time.Duration;
+
 import web.controllers.auth.objects.LoginRequest;
 import web.controllers.auth.objects.LoginResponse;
 import web.security.annotations.Authenticated;
@@ -27,7 +30,10 @@ public class AuthController extends Controller {
 
         final LoginResponse result = service.authenticate(data.getEmail(), data.getPassword());
 
-        response().setCookie("TOKEN", result.getToken(), 3_600, "/", null, false, true);
+        final Integer maxAge = (result.getExpiresAt() != null)
+            ? (int) Duration.between(result.getIssuedAt(), result.getExpiresAt()).getSeconds()
+            : null;
+        response().setCookie("TOKEN", result.getToken(), maxAge, "/", null, false, true);
 
         return ResultBuilder.of(result).ok();
     }

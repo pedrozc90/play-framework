@@ -45,7 +45,6 @@ public class FileProcessorActor extends BaseActor {
             .build();
     }
 
-    // TODO: Method Not Implemented
     private void onCommand(final Command cmd) {
         try {
             logger.info("Received command: {}", cmd);
@@ -65,7 +64,7 @@ public class FileProcessorActor extends BaseActor {
         } catch (Exception e) {
             int retries = cmd.retries + 1;
             if (retries > MAX_RETRIES) {
-                logger.error("Failed to process command: {}", cmd);
+                logger.error("Failed to process command: {}", cmd, e);
                 JPA.withTransaction(() -> taskService.update(cmd.taskId, TaskStatus.FAILED));
             } else {
                 dispatcher.tell(cmd.withRetries(retries), self());
