@@ -9,15 +9,14 @@ import play.libs.Json;
 import play.mvc.Controller;
 import play.mvc.Http;
 import play.mvc.Result;
-
-import java.time.Duration;
-
 import web.controllers.auth.objects.LoginRequest;
 import web.controllers.auth.objects.LoginResponse;
 import web.security.annotations.Authenticated;
 import web.security.annotations.RequiresRole;
 import web.security.objects.Attrs;
 import web.security.objects.UserContext;
+
+import java.time.Duration;
 
 public class AuthController extends Controller {
 

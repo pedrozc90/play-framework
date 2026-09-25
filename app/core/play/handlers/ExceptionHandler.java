@@ -2,11 +2,14 @@ package core.play.handlers;
 
 import core.exceptions.AppException;
 import core.play.utils.ResultBuilder;
+import play.Logger;
 import play.libs.F;
 import play.mvc.Http;
 import play.mvc.Result;
 
 public class ExceptionHandler {
+
+    private static final Logger.ALogger logger = Logger.of(ExceptionHandler.class);
 
     private static ExceptionHandler instance;
 
@@ -41,9 +44,13 @@ public class ExceptionHandler {
             return F.Promise.pure(cause.toResult());
         }
 
+        // Log the full exception server-side, but never echo internal detail (SQL text,
+        // class/field names, file paths, etc.) back to the client.
+        logger.error("Unhandled exception on {} {}", request.method(), request.path(), exception);
+
         return F.Promise.pure(
             ResultBuilder.of()
-                .message(exception.getMessage())
+                .message("An unexpected error occurred")
                 .internalServerError()
         );
     }

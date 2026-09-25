@@ -4,7 +4,6 @@ import com.querydsl.core.types.dsl.EntityPathBase;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import core.objects.Page;
-import domain.users.User;
 import play.Logger;
 import play.db.jpa.JPA;
 
@@ -12,6 +11,8 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 public abstract class JpaRepository<T, E extends EntityPathBase<T>, ID> {
+
+    private static final int MAX_ROWS = 100;
 
     protected final Logger.ALogger logger;
     protected final Class<T> clazz;
@@ -69,14 +70,19 @@ public abstract class JpaRepository<T, E extends EntityPathBase<T>, ID> {
     }
 
     public <R> Page<R> fetch(final JPAQuery<R> query, final int page, final int rows) {
+        final int clampedPage = Math.max(page, 1);
+        final int clampedRows = Math.min(Math.max(rows, 1), MAX_ROWS);
+
         final long total = query.clone().fetchCount();
 
+        final long offset = (long) (clampedPage - 1) * clampedRows;
+
         final List<R> list = query
-            .offset((long) (page - 1) * rows)
-            .limit(rows)
+            .offset(offset)
+            .limit(clampedRows)
             .fetch();
 
-        return new Page<>(page, rows, total, list);
+        return new Page<>(clampedPage, clampedRows, total, list);
     }
 
 }

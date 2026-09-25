@@ -1,8 +1,8 @@
 package application.users;
 
+import application.auth.PasswordService;
 import core.exceptions.AppException;
 import core.objects.Page;
-import core.utils.HashUtils;
 import core.utils.http.HttpStatus;
 import domain.users.User;
 import infrastructure.repositories.UserRepository;
@@ -13,6 +13,7 @@ import java.util.Objects;
 public class UserService {
 
     private final UserRepository repository = UserRepository.getInstance();
+    private final PasswordService passwordService = PasswordService.getInstance();
 
     private static UserService instance;
 
@@ -37,9 +38,8 @@ public class UserService {
     }
 
     public User get(final String email, final String password) throws AppException {
-        final String hashed = HashUtils.md5(password);
-        final User user = repository.get(email, hashed);
-        if (user == null) {
+        final User user = repository.get(email);
+        if (user == null || !passwordService.matches(password, user.getPassword())) {
             throw AppException.of(HttpStatus.UNAUTHORIZED, "Invalid email or password");
         }
         return user;
@@ -52,10 +52,9 @@ public class UserService {
             throw AppException.of(HttpStatus.CONFLICT, "User already exists");
         }
 
-        final String hashed = HashUtils.md5(password);
         final User user = new User();
         user.setEmail(email);
-        user.setPassword(hashed);
+        user.setPassword(passwordService.hash(password));
         return repository.persist(user);
     }
 
@@ -65,9 +64,8 @@ public class UserService {
             user.setEmail(cmd.getEmail());
         }
 
-        final String hashed = HashUtils.md5(cmd.getPassword());
-        if (!Objects.equals(user.getPassword(), hashed)) {
-            user.setPassword(hashed);
+        if (cmd.getPassword() != null && !passwordService.matches(cmd.getPassword(), user.getPassword())) {
+            user.setPassword(passwordService.hash(cmd.getPassword()));
         }
 
         if (!Objects.equals(user.isActive(), cmd.isActive())) {
@@ -81,7 +79,7 @@ public class UserService {
         repository.remove(user);
     }
 
-    public Page<User> fetch(final int page, final int rows, final String q, final Boolean active) {
+    public Page<User> fetch(final int page, final int rows, final String q, final Boolean active) throws AppException {
         return repository.fetch(page, rows, q, active);
     }
 

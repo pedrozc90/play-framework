@@ -23,7 +23,7 @@ public class UserController extends Controller {
     private static final UserMapper mapper = UserMapper.INSTANCE;
     private static final Validator validator = Validator.getInstance();
 
-    // @Authenticated
+    @Authenticated
     @Transactional
     public static Result fetch(final int page, final int rows, final String q, final Boolean active) throws AppException {
         final Page<User> result = userService.fetch(page, rows, q, active);

@@ -1,6 +1,7 @@
 package infrastructure.repositories;
 
 import com.querydsl.jpa.impl.JPAQuery;
+import core.exceptions.AppException;
 import core.objects.Page;
 import domain.files.FileStorage;
 import domain.files.QFileStorage;
@@ -29,7 +30,7 @@ public class FileStorageRepository extends JpaRepository<FileStorage, QFileStora
             .fetchOne();
     }
 
-    public Page<FileStorage> fetch(final int page, final int rows, final String q) {
+    public Page<FileStorage> fetch(final int page, final int rows, final String q) throws AppException {
         final JPAQuery<FileStorage> query = createQuery();
 
         if (q != null) {

@@ -8,6 +8,8 @@ import lombok.ToString;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @EqualsAndHashCode(callSuper = true)
@@ -37,5 +39,10 @@ public class User extends AuditEntity implements Serializable {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    @ElementCollection
+    @CollectionTable(name = "user_roles", joinColumns = @JoinColumn(name = "user_id"))
+    @Column(name = "role", nullable = false)
+    private Set<String> roles = new HashSet<>();
 
 }

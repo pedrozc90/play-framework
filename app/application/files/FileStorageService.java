@@ -1,5 +1,6 @@
 package application.files;
 
+import core.exceptions.AppException;
 import core.objects.Page;
 import core.utils.FileUtils;
 import core.utils.HashUtils;
@@ -53,7 +54,7 @@ public class FileStorageService {
     }
 
     // ENDPOINTS
-    public Page<FileStorage> fetch(final int page, final int rows, final String q) {
+    public Page<FileStorage> fetch(final int page, final int rows, final String q) throws AppException {
         return repository.fetch(page, rows, q);
     }
 

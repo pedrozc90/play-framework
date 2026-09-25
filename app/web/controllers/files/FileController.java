@@ -17,6 +17,7 @@ import play.mvc.Http;
 import play.mvc.Result;
 import web.dtos.FileStorageDto;
 import web.mappers.FileStorageMapper;
+import web.security.annotations.Authenticated;
 
 import java.util.Objects;
 
@@ -36,6 +37,7 @@ public class FileController extends Controller {
         return ResultBuilder.of(resultDto).ok();
     }
 
+    @Authenticated
     public static Result upload() throws AppException {
         final Http.MultipartFormData payload = request().body().asMultipartFormData();
         Objects.requireNonNull(payload, "Multipart form data must not be null");

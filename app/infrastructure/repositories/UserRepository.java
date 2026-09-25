@@ -2,6 +2,7 @@ package infrastructure.repositories;
 
 
 import com.querydsl.jpa.impl.JPAQuery;
+import core.exceptions.AppException;
 import core.objects.Page;
 import domain.users.QUser;
 import domain.users.User;
@@ -28,15 +29,7 @@ public class UserRepository extends JpaRepository<User, QUser, Long> {
             .fetchOne();
     }
 
-    public User get(final String email, final String password) {
-        if (email == null || password == null) return null;
-        return createQuery()
-            .where(entity.email.eq(email))
-            .where(entity.password.eq(password))
-            .fetchOne();
-    }
-
-    public Page<User> fetch(final int page, final int rows, final String q, final Boolean active) {
+    public Page<User> fetch(final int page, final int rows, final String q, final Boolean active) throws AppException {
         final QUser user = QUser.user;
         final JPAQuery<User> query = createQuery();
 

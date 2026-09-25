@@ -39,7 +39,7 @@ public class AuthenticationService {
 
     public LoginResponse authenticate(final String email, final String password) throws AppException {
         final User user = userService.get(email, password);
-        final Set<String> roles = new HashSet<>();
+        final Set<String> roles = new HashSet<>(user.getRoles());
         final Set<String> permissions = new HashSet<>();
         final JwtClaims claims = new JwtClaims(user.getEmail(), user.getId(), roles, permissions);
         final JwtEncoded result = tokenService.encode(claims);

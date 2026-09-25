@@ -80,10 +80,25 @@ CREATE TABLE IF NOT EXISTS users (
     CONSTRAINT users_email_ukey UNIQUE (email)
 );
 
+-- user roles (backs the User.roles element collection used by @RequiresRole authorization)
+CREATE TABLE IF NOT EXISTS user_roles (
+    user_id BIGINT      NOT NULL,
+    role    VARCHAR(64) NOT NULL,
+
+    CONSTRAINT user_roles_pkey PRIMARY KEY (user_id, role),
+    CONSTRAINT user_roles_user_id_fkey FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE ON UPDATE CASCADE
+);
+
 INSERT INTO users (email, password)
 VALUES ( 'contare@email.com', md5('password'));
 
+-- grant the seeded demo user the admin role so role-gated endpoints (e.g. AuthController.permissions()) are reachable
+INSERT INTO user_roles (user_id, role)
+SELECT id, 'admin' FROM users WHERE email = 'contare@email.com';
+
 # --- !Downs
+
+DROP TABLE IF EXISTS user_roles CASCADE;
 DROP TABLE IF EXISTS tasks CASCADE;
 DROP TABLE IF EXISTS jobs CASCADE;
 DROP TABLE IF EXISTS file_storage CASCADE;
